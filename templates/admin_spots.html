@@ -1,0 +1,91 @@
+{% extends "main.html" %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#" style="font-size: 1.6rem;">Vehicle Parking App</a>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('admin.lots') }}">Manage Lots</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.admin_users' %} active{% endif %}" href="{{ url_for('admin.admin_users') }}">Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.revenue' %} active{% endif %}" href="{{ url_for('admin.revenue') }}">Revenue</a>
+      </li>
+    </ul>
+    <a href="{{ url_for('authorisation.logout') }}" class="btn btn-outline-light">Logout</a>
+  </div>
+</nav>
+
+<div class = "page active" id="adminSpots">
+<div class="container">
+  <h2 class="mb-4">Parking Spots for Lot: {{ lot.prime_location_name }}</h2>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="POST" action="{{ url_for('admin.add_spot', lot_id=lot.id) }}" style="display:inline;">
+      <button type="submit" class="btn btn-success">Add Spot</button>
+    </form>
+  </div>
+  <form method="get" action="{{ url_for('admin.view_spots', lot_id=lot.id) }}" class="mb-3" id="spotSearchForm">
+    <div class="input-group">
+      <input type="text" class="form-control" name="q" id="spotSearchInput" placeholder="Search..." value="{{ search_query|default('') }}" {% if search_field == 'status' %}style="display:none;"{% endif %}>
+      <select class="form-select" name="field" id="spotFieldSelect" style="max-width: 170px;">
+        <option value="all" {% if search_field == 'all' %}selected{% endif %}>All Fields</option>
+        <option value="spot_no" {% if search_field == 'spot_no' %}selected{% endif %}>Spot No</option>
+        <option value="vehicle_number" {% if search_field == 'vehicle_number' %}selected{% endif %}>Vehicle Number</option>
+      </select>
+      <input type="date" class="form-control" name="date" value="{{ selected_date|default(today) }}" style="max-width: 180px;">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+  </form>
+  <div class="mb-3">
+    <span>Filter by Status: </span>
+    <a href="{{ url_for('admin.view_spots', lot_id=lot.id, q=search_query, field=search_field) }}" class="badge {% if not request.args.get('status') %}bg-primary text-light{% else %}bg-light text-dark border{% endif %} mx-1" style="cursor:pointer; text-decoration:none;">All</a>
+    <a href="{{ url_for('admin.view_spots', lot_id=lot.id, q=search_query, field=search_field, status='available') }}" class="badge {% if request.args.get('status') == 'available' %}bg-success text-light{% else %}bg-light text-dark border{% endif %} mx-1" style="cursor:pointer; text-decoration:none;">Available</a>
+    <a href="{{ url_for('admin.view_spots', lot_id=lot.id, q=search_query, field=search_field, status='occupied') }}" class="badge {% if request.args.get('status') == 'occupied' %}bg-danger text-light{% else %}bg-light text-dark border{% endif %} mx-1" style="cursor:pointer; text-decoration:none;">Occupied</a>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Spot No</th>
+              <th>Status (on {{ selected_date }})</th>
+              <th>Vehicle Number</th>
+              <th style="width: 300px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for spot in spots %}
+            <tr>
+              <td>{{ spot.spot_no }}</td>
+              <td>
+                {% if spot.is_occupied %}
+                  <span class="badge bg-danger">Occupied</span>
+                {% else %}
+                  <span class="badge bg-success">Available</span>
+                {% endif %}
+              </td>
+              <td>{{ spot.vehicle_number }}</td>
+              
+              <td>
+                <a href="{{ url_for('admin.spot_history', spot_id=spot.id) }}" class="btn btn-info btn-sm mb-1">View Spot Details</a>
+                <form method="POST" action="{{ url_for('admin.delete_spot', spot_id=spot.id) }}" style="display:inline;">
+                  <button type="submit" class="btn btn-danger btn-sm" {% if spot.is_occupied %}disabled title="Cannot delete occupied spot"{% endif %} onclick="return confirm('Are you sure you want to delete this spot?');">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

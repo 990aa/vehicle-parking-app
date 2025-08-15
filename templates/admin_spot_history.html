@@ -1,0 +1,142 @@
+{% extends 'main.html' %}
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#" style="font-size: 1.6rem;">Vehicle Parking App</a>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.admin_dashboard' %} active{% endif %}" href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.lots' %} active{% endif %}" href="{{ url_for('admin.lots') }}">Manage Lots</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.admin_users' %} active{% endif %}" href="{{ url_for('admin.admin_users') }}">Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.revenue' %} active{% endif %}" href="{{ url_for('admin.revenue') }}">Revenue</a>
+      </li>
+    </ul>
+    <a href="{{ url_for('authorisation.logout') }}" class="btn btn-outline-light">Logout</a>
+  </div>
+</nav>
+
+<div class = "page active" id = "adminSpotRecords"
+<h2>Spot #{{ spot.spot_no }} Records (Lot: {{ spot.lot_id }})</h2>
+<hr>
+<div class="card mb-3">
+  <div class="card-header bg-info text-white">Active Reservations</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead><tr><th>User</th><th>Email</th><th>Vehicle</th><th>Booking Date</th><th>Parking Time</th><th>Leaving Time</th><th>Duration (hrs)</th><th>Cost</th></tr></thead>
+        <tbody>
+        {% if active and active|length > 0 %}
+          {% for r in active %}
+          <tr>
+              <td>{{ r.username }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.booking_date }}</td>
+              <td>{{ r.parking_time }}</td>
+              <td>{{ r.leaving_time }}</td>
+              <td>{{ r.duration }}</td>
+              <td>-</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td class="text-center" colspan="8">No active reservations.</td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div class="card mb-3">
+  <div class="card-header bg-success text-white">Completed Reservations</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead><tr><th>User</th><th>Email</th><th>Vehicle</th><th>Booking Date</th><th>Parking Time</th><th>Leaving Time</th><th>Duration (hrs)</th><th>Cost</th></tr></thead>
+        <tbody>
+        {% if completed %}
+          {% for r in completed %}
+          <tr>
+              <td>{{ r.username }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.booking_date }}</td>
+              <td>{{ r.parking_time }}</td>
+              <td>{{ r.leaving_time }}</td>
+              <td>{{ r.duration }}</td>
+              <td>{{ r.cost }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td class="text-center" colspan="8">No completed reservations.</td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header bg-warning text-dark">Upcoming Reservations</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead><tr><th>User</th><th>Email</th><th>Vehicle</th><th>Booking Date</th><th>Duration (hrs)</th><th>Cost</th></tr></thead>
+        <tbody>
+        {% if upcoming %}
+          {% for r in upcoming %}
+          <tr>
+              <td>{{ r.username }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.booking_date }}</td>
+              <td>{{ r.duration or '-' }}</td>
+              <td>{{ '-' }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td class="text-center" colspan="6">No upcoming reservations.</td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header bg-danger text-white">Cancelled Reservations</div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0">
+        <thead><tr><th>User</th><th>Email</th><th>Vehicle</th><th>Parking Time</th><th>Leaving Time</th><th>Duration (hrs)</th><th>Cost</th></tr></thead>
+        <tbody>
+        {% if cancelled %}
+          {% for r in cancelled %}
+          <tr>
+              <td>{{ r.username }}</td>
+              <td>{{ r.email }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.parking_time }}</td>
+              <td>{{ r.leaving_time or '-' }}</td>
+              <td>{{ r.duration or '-' }}</td>
+              <td>{{ '-' }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" class="text-center">No cancelled reservations.</td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+{% endblock %}

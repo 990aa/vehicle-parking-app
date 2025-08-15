@@ -1,0 +1,419 @@
+openapi: 3.1.1
+info:
+  title: Vehicle Parking App API
+  description: API documentation for the Vehicle Parking App
+servers:
+  - url: http://localhost:5000
+paths:
+  /register:
+    get:
+      summary: Display registration form
+      responses:
+        '200':
+          description: Registration form
+    post:
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                password_confirm:
+                  type: string
+      responses:
+        '302':
+          description: Redirect to login on success
+        '200':
+          description: Registration form with errors
+  /login:
+    get:
+      summary: Display login form
+      responses:
+        '200':
+          description: Login form
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '302':
+          description: Redirect to dashboard on success
+        '200':
+          description: Login form with errors
+  /logout:
+    get:
+      summary: Logout user
+      responses:
+        '302':
+          description: Redirect to login
+  /check_duplicate:
+    post:
+      summary: Check for duplicate username/email (AJAX)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: JSON result for duplicate check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: boolean
+                  email:
+                    type: boolean
+  /admin/dashboard:
+    get:
+      summary: Admin dashboard (charts, stats)
+      responses:
+        '200':
+          description: Admin dashboard HTML
+  /admin/users:
+    get:
+      summary: View all users
+      responses:
+        '200':
+          description: Users list HTML
+  /admin/user/{user_id}/activity:
+    get:
+      summary: View user activity/history
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User activity HTML
+  /admin/users/delete/{user_id}:
+    post:
+      summary: Delete a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to admin dashboard
+  /admin/lots:
+    get:
+      summary: View/manage parking lots
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search query
+        - in: query
+          name: field
+          schema:
+            type: string
+          description: Search field
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+          description: Filter by date
+      responses:
+        '200':
+          description: Lots management HTML
+  /admin/lots/create:
+    get:
+      summary: Display form to create a new parking lot
+      responses:
+        '200':
+          description: Create lot form HTML
+    post:
+      summary: Create a new parking lot
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prime_location_name:
+                  type: string
+                price_per_hr:
+                  type: number
+                address:
+                  type: string
+                pin_code:
+                  type: string
+                max_spots:
+                  type: integer
+      responses:
+        '302':
+          description: Redirect to lots page
+  /admin/lots/edit/{id}:
+    get:
+      summary: Display form to edit a parking lot
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Edit lot form HTML
+    post:
+      summary: Edit parking lot
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prime_location_name:
+                  type: string
+                price_per_hr:
+                  type: number
+                address:
+                  type: string
+                pin_code:
+                  type: string
+                max_spots:
+                  type: integer
+      responses:
+        '302':
+          description: Redirect to lots page
+  /admin/lots/delete/{id}:
+    post:
+      summary: Delete parking lot
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to lots page
+  /admin/lot/{lot_id}/spots:
+    get:
+      summary: View spots in a lot
+      parameters:
+        - in: path
+          name: lot_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Spots list HTML
+  /admin/lot/{lot_id}/add_spot:
+    post:
+      summary: Add a new spot to a lot
+      parameters:
+        - in: path
+          name: lot_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to spots page
+  /admin/spot/{spot_id}:
+    get:
+      summary: View spot history
+      parameters:
+        - in: path
+          name: spot_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Spot history HTML
+  /admin/spot/delete/{spot_id}:
+    post:
+      summary: Delete a parking spot
+      parameters:
+        - in: path
+          name: spot_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to previous page
+  /admin/revenue:
+    get:
+      summary: View revenue records
+      responses:
+        '200':
+          description: Revenue records HTML
+  /user/dashboard:
+    get:
+      summary: User dashboard (stats, charts)
+      responses:
+        '200':
+          description: User dashboard HTML
+  /user/booking:
+    get:
+      summary: Book a parking spot (form)
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: field
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking form HTML
+  /user/book_spot/{lot_id}:
+    post:
+      summary: Book a parking spot in a lot
+      parameters:
+        - in: path
+          name: lot_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                vehicle_number:
+                  type: string
+                date:
+                  type: string
+                  format: date
+      responses:
+        '302':
+          description: Redirect to user dashboard or booking history
+  /user/mark_parked/{reservation_id}:
+    get:
+      summary: Mark a reservation as parked (confirmation)
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to user dashboard
+    post:
+      summary: Mark a reservation as parked
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to user dashboard
+  /user/release_spot/{reservation_id}:
+    get:
+      summary: Release/vacate a parking spot (confirmation)
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to user dashboard
+    post:
+      summary: Release/vacate a parking spot
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to user dashboard or booking history
+  /user/cancel_reservation/{reservation_id}:
+    post:
+      summary: Cancel a reservation
+      parameters:
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Redirect to user dashboard or booking history
+  /user/history:
+    get:
+      summary: View user booking history
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: field
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking history HTML
+components:
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: session
+security:
+  - SessionAuth: []

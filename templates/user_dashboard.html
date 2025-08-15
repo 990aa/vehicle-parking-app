@@ -1,0 +1,292 @@
+{% extends "main.html" %}
+
+{% block head_extra %}
+<style>
+  .chart-container { height: 350px; }
+</style>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- user dashboard header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top" >
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#" style="font-size: 1.6rem;">Vehicle Parking App</a>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'user.user_dashboard' %} active{% endif %}" href="{{ url_for('user.user_dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'user.user_booking' %} active{% endif %}" href="{{ url_for('user.user_booking') }}">Book Spot</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'user.user_history' %} active{% endif %}" href="{{ url_for('user.user_history') }}">History</a>
+      </li>
+    </ul>
+    
+    <a href="{{ url_for('authorisation.logout') }}" class="btn btn-outline-light">Logout</a>
+  </div>
+</nav>
+<div class="page active" id="userDashboard">
+    <!-- dashboard for user, checked variable names match backend, compared with admin dashboard -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div>
+                    <h5>Active Reservations</h5>
+                    <p id="userActiveReservations">{{ A_reservation_count if A_reservation_count is not none else '0' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div>
+                    <h5>Total Bookings</h5>
+                    <p id="userTotalBookings">{{ total_bookings_count if total_bookings_count is not none else '0' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div>
+                    <h5>Total Spent</h5>
+                    <p id="userTotalSpent">₹{{ "%.2f"|format(total_spent) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Bookings by Status per Lot</div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        {% if stacked_plotly %}
+                            {{ stacked_plotly|safe }}
+                        {% else %}
+                            <div class="text-muted">No data to display.</div>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">Bookings by status (completed, cancelled, upcoming, active) for each lot.</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Total Spent per Lot</div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        {% if spent_plotly %}
+                            {{ spent_plotly|safe }}
+                        {% else %}
+                            <div class="text-muted">No data to display.</div>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">Total amount you have spent in each parking lot.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card mb-3">
+      <div class="card-header bg-warning text-dark">Upcoming Reservations</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          {% if upcoming_reservations %}
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Lot</th>
+                <th>Spot</th>
+                <th>Vehicle Number</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for r in upcoming_reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.lot_name }}</td>
+                <td>#{{ r.spot_number }}</td>
+                <td>{{ r.vehicle_number }}</td>
+                <td>{{ r.timein.split(' ')[0] if r.timein else '-' }}</td>
+                <td>
+                  {% if r.status == 'U' %}
+                    <span class="badge bg-warning text-dark">Upcoming</span>
+                  {% elif r.status == 'A' %}
+                    <span class="badge bg-info">Active</span>
+                  {% elif r.status == 'C' %}
+                    <span class="badge bg-success">Completed</span>
+                  {% elif r.status == 'X' %}
+                    <span class="badge bg-danger">Cancelled</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Unknown</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if r.status == 'U' %}
+                    <form action="{{ url_for('user.mark_parked', reservation_id=r.id) }}" method="post" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-primary">Mark as Parked</button>
+                    </form>
+                    <form action="{{ url_for('user.cancel_reservation', reservation_id=r.id) }}" method="post" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this reservation?');">Cancel</button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state mb-4">
+            <i class="fas fa-calendar"></i>
+            <p>No upcoming reservations</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+
+    <div class="card mb-3">
+      <div class="card-header bg-info text-white">Active Reservations</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          {% if active_reservations %}
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Lot</th>
+                <th>Spot</th>
+                <th>Vehicle Number</th>
+                <th>Parking Time</th>
+                <th>Duration</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for r in active_reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.lot_name }}</td>
+                <td>#{{ r.spot_number }}</td>
+                <td>{{ r.vehicle_number }}</td>
+                <td>{{ r.timein }}</td>
+                <td>{{ r.duration }}</td>
+                <td>{{ '-' }}</td>
+                <td><span class="badge bg-info">Active</span></td>
+                <td>
+                  <form method="POST" action="{{ url_for('user.release_spot', reservation_id=r.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn--sm btn--warning confirm-delete" data-confirm-message="Are you sure you want to release this spot and end your parking session?">
+                      <i class="fas fa-sign-out-alt me-1"></i>Release Spot
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state mb-4">
+            <i class="fas fa-car"></i>
+            <p>No active reservations</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-success text-white">Completed Reservations</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          {% if completed_reservations %}
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Lot</th>
+                <th>Spot</th>
+                <th>Vehicle Number</th>
+                <th>Parking Time</th>
+                <th>Leaving Time</th>
+                <th>Duration</th>
+                <th>Cost</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for r in completed_reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.lot_name }}</td>
+                <td>#{{ r.spot_number }}</td>
+                <td>{{ r.vehicle_number }}</td>
+                <td>{{ r.timein }}</td>
+                <td>{{ r.timeout }}</td>
+                <td>{{ r.duration }}</td>
+                <td>{{ r.cost }}</td>
+                <td><span class="badge bg-success">Completed</span></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state mb-4">
+            <i class="fas fa-check-circle"></i>
+            <p>No completed reservations</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-danger text-white">Cancelled Reservations</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          {% if cancelled_reservations %}
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Lot</th>
+                <th>Spot</th>
+                <th>Vehicle Number</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for r in cancelled_reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.lot_name }}</td>
+                <td>#{{ r.spot_number }}</td>
+                <td>{{ r.vehicle_number }}</td>
+                <td>{{ r.date }}</td>
+                <td><span class="badge bg-danger">Cancelled</span></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state mb-4">
+            <i class="fas fa-times-circle"></i>
+            <p>No cancelled reservations</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}

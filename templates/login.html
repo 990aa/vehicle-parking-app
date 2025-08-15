@@ -1,0 +1,41 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div class="row justify-content-center" style="padding-top: 50px;">
+    <div class="col-12 mb-4">
+        <h1 class="text-center display-5 fw-bold" style="letter-spacing:1px;">Vehicle Parking App</h1>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4">Login</h3>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      {% if message == 'Invalid username or password' %}
+                        <div class="alert text-center" style="color: #FF0000;">{{ message }}</div>
+                      {% else %}
+                        <div class="alert alert-{{ category }} text-center">{{ message }}</div>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+                <form method="POST" action="{{ url_for('authorisation.login') }}">
+                  <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                  </div>
+                  <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+                </form>
+                <p class="text-center mt-3">
+                  Don't have an account? <a href="{{ url_for('authorisation.register') }}">Register here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

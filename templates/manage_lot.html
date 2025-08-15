@@ -1,0 +1,45 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <form id="lotForm" method="POST" action="{{ edit_mode and url_for('admin.edit_lot', lot_id=lot.id) or url_for('admin.create_lot') }}">
+          <div class="card-header">
+            <h4 class="mb-0">{{ 'Edit Parking Lot' if edit_mode else 'Create Parking Lot' }}</h4>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="prime_location_name" class="form-label">Lot Name</label>
+              <input type="text" class="form-control" id="prime_location_name" name="prime_location_name" required value="{{ lot.prime_location_name if edit_mode else '' }}">
+            </div>
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <textarea class="form-control" id="address" name="address" rows="2" required>{{ lot.address if edit_mode else '' }}</textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="pin_code" class="form-label">Pin Code</label>
+                <input type="text" class="form-control" id="pin_code" name="pin_code" required value="{{ lot.pin_code if edit_mode else '' }}">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="price_per_hr" class="form-label">Price per Hour (₹)</label>
+                <input type="number" class="form-control" id="price_per_hr" name="price_per_hr" step="0.01" min="0" required value="{{ lot.price_per_hr if edit_mode else '' }}">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="max_spots" class="form-label">Maximum Spots</label>
+              <input type="number" class="form-control" id="max_spots" name="max_spots" min="1" required value="{{ lot.max_spots if edit_mode else '' }}">
+            </div>
+          </div>
+          <div class="card-footer text-end">
+            <a href="{{ url_for('admin.lots') }}" class="btn btn--secondary">Cancel</a>
+            <button type="submit" class="btn btn--primary" id="saveLotBtn">Save Lot</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "main.html" %}
+{% block content %}
+<!-- Admin Dashboard Header/Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top" >
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#" style="font-size: 1.6rem;">Vehicle Parking App</a>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.admin_dashboard' %} active{% endif %}" href="{{ url_for('admin.admin_dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.lots' %} active{% endif %}" href="{{ url_for('admin.lots') }}">Manage Lots</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.admin_users' %} active{% endif %}" href="{{ url_for('admin.admin_users') }}">Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.endpoint == 'admin.revenue' %} active{% endif %}" href="{{ url_for('admin.revenue') }}">Revenue</a>
+      </li>
+    </ul>
+    <a href="{{ url_for('authorisation.logout') }}" class="btn btn-outline-light">Logout</a>
+  </div>
+</nav>
+<div class="page active" id="adminUserActivity">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">User Activity</h2>
+  </div>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">User Details</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card mb-3">
+    <div class="card-header bg-info text-white">Active Reservations</div>
+    <div class="card-body p-0">
+      <div class="table-responsive" style="margin:0;">
+        <table class="table table-striped mb-0" style="margin-bottom:0;">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th style="width: 150px;">Lot</th>
+              <th>Spot</th>
+              <th>Vehicle Number</th>
+              <th>Parking Time</th>
+              <th>Leaving Time</th>
+              <th>Cost</th>
+              <th style="width: 150px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservations if r.status == 'A' and r.parking_time <= now %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.parking_spot.parking_lot.prime_location_name }}</td>
+              <td>{{ r.parking_spot.spot_no }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.parking_time.strftime('%d-%m-%Y %H:%M') }}</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="badge bg-info">Active</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center">No active reservations.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header bg-success text-white">Completed Reservations</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th style="width: 150px;">Lot</th>
+              <th>Spot</th>
+              <th>Vehicle Number</th>
+              <th>Parking Time</th>
+              <th>Leaving Time</th>
+              <th>Cost</th>
+              <th style="width: 150px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservations if r.status == 'C' %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.parking_spot.parking_lot.prime_location_name }}</td>
+              <td>{{ r.parking_spot.spot_no }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.parking_time.strftime('%d-%m-%Y %H:%M') }}</td>
+              <td>{% if r.leaving_time %}{{ r.leaving_time.strftime('%d-%m-%Y %H:%M') }}{% else %}-{% endif %}</td>
+              <td>₹{{ r.cost }}</td>
+              <td><span class="badge bg-success">Completed</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center">No completed reservations.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-3">
+    <div class="card-header bg-danger text-white">Cancelled Reservations</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th style="width: 150px;">Lot</th>
+              <th>Spot</th>
+              <th>Vehicle Number</th>
+              <th>Booking Date</th>
+              <th>Parking Time</th>
+              <th>Leaving Time</th>
+              <th>Cost</th>
+              <th style="width: 150px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservations if r.status == 'X' %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.parking_spot.parking_lot.prime_location_name }}</td>
+              <td>{{ r.parking_spot.spot_no }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.parking_time.strftime('%d-%m-%Y') if r.parking_time else '-' }}</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="badge bg-danger">Cancelled</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center">No cancelled reservations.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-3">
+    <div class="card-header bg-warning text-dark">Upcoming Reservations</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th style="width: 150px;">Lot</th>
+              <th>Spot</th>
+              <th>Vehicle Number</th>
+              <th>Booking Date</th>
+              <th>Parking Time</th>
+              <th>Leaving Time</th>
+              <th>Cost</th>
+              <th style="width: 150px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservations if r.status == 'U' and r.parking_time > now %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.parking_spot.parking_lot.prime_location_name }}</td>
+              <td>{{ r.parking_spot.spot_no }}</td>
+              <td>{{ r.vehicle_number }}</td>
+              <td>{{ r.parking_time.strftime('%d-%m-%Y') if r.parking_time else '-' }}</td>
+              <td>{{'-' }}</td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="badge bg-warning text-dark">Upcoming</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center">No upcoming reservations.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+/* basic overriding features */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa; /* Light gray background */
+    /*padding-top: 45px;  fixed navbar */
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.page {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+/* overriding buttons */
+.btn {
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+.btn i {
+    margin-right: 0.3rem;
+}
+.btn--primary {
+    background-color: #007bff; /* Bootstrap primary */
+    border-color: #007bff;
+    color: white;
+}
+.btn--primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.btn--secondary {
+    background-color: #6c757d; /* Bootstrap secondary */
+    border-color: #6c757d;
+    color: white;
+}
+.btn--secondary:hover {
+    background-color: #545b62;
+    border-color: #545b62;
+}
+.btn--warning {
+    background-color: #ffc107; /* Bootstrap warning */
+    border-color: #ffc107;
+    color: #212529;
+}
+.btn--warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+.btn--outline {
+    border: 1px solid #ced4da;
+    color: #495057;
+}
+.btn--outline:hover {
+    background-color: #e9ecef;
+}
+.btn--sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+.btn--full-width {
+    width: 100%;
+}
+.action-buttons button {
+    margin-right: 5px;
+}
+.action-buttons button:last-child {
+    margin-right: 0;
+}
+
+/* custom cards */
+.card {
+    margin-bottom: 1.5rem;
+}
+.stat-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.stat-card i {
+    margin-right: 15px;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+}
+.stat-card h5 {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.stat-card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+.parking-lot-card, .reservation-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease-in-out;
+}
+.parking-lot-card:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.parking-lot-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+}
+.parking-lot-card h5, .reservation-card h6 {
+    color: #007bff;
+}
+.price-display {
+    font-weight: bold;
+    color: #28a745; /* Green for price */
+}
+.spot-status {
+    font-size: 0.9em;
+}
+.spot-status.available i { color: #28a745; } /* Green */
+.spot-status.occupied i { color: #dc3545; } /* Red */
+.reservation-card.active {
+    border-left: 5px solid #ffc107; /* Yellow for active */
+}
+.reservation-card.completed {
+    border-left: 5px solid #28a745; /* Green for completed */
+}
+
+/* custom statuses */
+.status {
+    padding: 0.25em 0.6em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+.status--info { background-color: #17a2b8; } /* Bootstrap info */
+.status--warning { background-color: #ffc107; color: #212529; } /* Bootstrap warning */
+.status--success { background-color: #28a745; } /* Bootstrap success */
+.status--danger { background-color: #dc3545; } /* Bootstrap danger */
+
+/* Forms */
+.form-label { font-weight: 500; }
+
+/* Tables */
+.table th {
+    background-color: #e9ecef;
+    font-weight: 600;
+}
+.table td .action-buttons {
+    display: flex;
+    gap: 5px; /* Spacing between buttons */
+}
+
+/* table edited later */
+
+/* end edit */
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Toast Container (already has inline style for position, but can add more) */
+#toastContainer .toast {
+    min-width: 300px; /* Ensure toasts are wide enough */
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* High z-index */
+}
+
+/* container for chart sizing */
+.chart-container {
+    position: relative;
+    height: 300px; /* Default height, can be overridden */
+    width: 100%;
+}
+
+/* Utility classes from original JS, can be adapted or rely on Bootstrap */
+.flex { display: flex; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.me-1 { margin-right: 0.25rem !important; }
+.text-muted { color: #6c757d !important; }
+.text-warning { color: #ffc107 !important; }

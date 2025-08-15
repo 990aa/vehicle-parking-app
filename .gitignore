@@ -1,0 +1,10 @@
+ideas.txt
+.env
+instance/
+controllers/__pycache__/
+models/__pycache__/
+migrations/
+.vscode/
+.venv/
+.venv-1/
+__pycache__/

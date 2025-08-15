@@ -1,0 +1,116 @@
+{% extends "main.html" %}
+
+{% block content %}
+<!-- User Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top" >
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#" style="font-size: 1.6rem;">Vehicle Parking App</a>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link{% if request.path == url_for('user.user_dashboard') %} active{% endif %}" href="{{ url_for('user.user_dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.path == url_for('user.user_booking') %} active{% endif %}" href="{{ url_for('user.user_booking') }}">Book Spot</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link{% if request.path == url_for('user.user_history') %} active{% endif %}" href="{{ url_for('user.user_history') }}">History</a>
+      </li>
+    </ul>
+    <a href="{{ url_for('authorisation.logout') }}" class="btn btn-outline-light">Logout</a>
+  </div>
+</nav>
+<div class="page active" id="userHistory">
+    <!-- I will show booking history, I will check backend for correct variable names, sometimes I compare with dashboard -->
+    <h2 class="mb-4">My Booking History</h2>
+
+    <form method="get" action="{{ url_for('user.user_history') }}" class="mb-3">
+        <div class="input-group mb-2">
+            <input type="text" class="form-control" name="q" placeholder="Search..." value="{{ search_query|default('') }}">
+            <select class="form-select" name="field" style="max-width: 150px;">
+                <option value="all" {% if search_field == 'all' %}selected{% endif %}>All Fields</option>
+                <option value="id" {% if search_field == 'id' %}selected{% endif %}>ID</option>
+                <option value="location" {% if search_field == 'location' %}selected{% endif %}>Lot Name</option>
+                <option value="spot_number" {% if search_field == 'spot_number' %}selected{% endif %}>Spot No</option>
+                <option value="vehicle_number" {% if search_field == 'vehicle_number' %}selected{% endif %}>Vehicle Number</option>
+                <option value="date" {% if search_field == 'date' %}selected{% endif %}>Date</option>
+            </select>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+        <div class="mb-2">
+            <span class="me-2">Filter by Status:</span>
+            {% set statuses = [
+                ('all', 'All'),
+                ('active', 'Active'),
+                ('completed', 'Completed'),
+                ('upcoming', 'Upcoming'),
+                ('cancelled', 'Cancelled')
+            ] %}
+            {% for val, label in statuses %}
+                <a href="{{ url_for('user.user_history', q=search_query, field=search_field, status=val if val != 'all' else None) }}"
+                   class="badge rounded-pill px-3 py-2 me-1 mu-5 mb-1  {% if status_filter == val or (not status_filter and val == 'all') %}bg-primary text-light{% else %}bg-light text-dark border{% endif %}">
+                    {{ label }}
+                </a>
+            {% endfor %}
+        </div>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Lot Name</th>
+                    <th>Spot No</th>
+                    <th>Vehicle Number</th>
+                    <th>Date</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Duration</th>
+                    <th>Total Cost</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="historyTableBody">
+                {% set histList = history %}
+                {% if histList %}
+                    {# debug: print length of history, I will remove later #}
+                    <!-- <script>
+                        // log the number of history records
+                        try {
+                            var htb = document.getElementById('historyTableBody');
+                            if(htb) console.log('History rows:', htb.children.length);
+                        } catch(e) { console.log('historyTableBody error', e); }
+                    </script> -->
+                    {% for bookingRec in histList %}
+                    {% set rowId = bookingRec.id %}
+                    <tr>
+                        <td>{{ rowId }}</td>
+                        <td>{{ bookingRec.lot_name }}</td>
+                        <td>{{ bookingRec.spot_number }}</td>
+                        <td>{{ bookingRec.vehicle_number }}</td>
+                        <td>{{ bookingRec.date }}</td>
+                        <td>{{ bookingRec.checkin }}</td>
+                        <td>{{ bookingRec.checkout }}</td>
+                        <td>{{ bookingRec.duration }}</td>
+                        <td>{{ bookingRec.cost }}</td>
+                        <td>{{ bookingRec.status }}</td>
+                    </tr>
+                    {# Dead code: I tried to add a "details" button here, but it never worked right #}
+                    {# <td><button class="btn btn-sm btn-info">Details</button></td> #}
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <!-- I will show empty state, I will check colspan, table will look weird with wrong value -->
+                    <td colspan="8" class="text-center text-muted">No booking history found.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {# debug: I will check if table rendered #}
+    <script>
+        // I will log if table exists
+        var tbl = document.querySelector('.table');
+        if(tbl){console.log('Booking history table present');}
+    </script>
+</div>
+{% endblock %}
