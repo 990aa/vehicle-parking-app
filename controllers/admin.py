@@ -513,7 +513,11 @@ def view_spots(lot_id):
     for spot in all_spots:
         # check if this spot is booked for the selected date
         # For this spot, check if it is booked on selected date
-        reservation_on_date = Reservation.query.filter_by(spot_id=spot.id).filter(db.func.date(Reservation.parking_time)==selected_dt).first()
+        reservation_on_date = Reservation.query.filter(
+            Reservation.spot_id == spot.id,
+            db.func.date(Reservation.parking_time) == selected_dt,
+            Reservation.status.in_(['A', 'U'])
+        ).first()
         is_occupied = reservation_on_date is not None
         vehicle_number = reservation_on_date.vehicle_number if is_occupied and hasattr(reservation_on_date, 'vehicle_number') else '-'
         # get all the dates this spot is booked

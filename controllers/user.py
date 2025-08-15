@@ -299,11 +299,11 @@ def book_spot(lot_id):
     # find an available spot that's not already reserved for that date
     # Find an available spot not already reserved for that date
     all_spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
-    # Get all reservations for this lot and date (status A or U or C for that date)
+    # Get all reservations for this lot and date (status A or U for that date)
     reserved_spot_ids = [r.spot_id for r in Reservation.query.filter(
         Reservation.spot_id.in_([s.id for s in all_spots]),
         db.func.date(Reservation.parking_time)==booking_date.date(),
-        Reservation.status.in_(['A','U','C'])
+        Reservation.status.in_(['A','U'])
     ).all()]
     available_spots = [s for s in all_spots if s.id not in reserved_spot_ids]
     if not available_spots:
@@ -405,6 +405,11 @@ def release_spot(reservation_id):
                 reservation.cost = round(hrs_ceiled * lot.price_per_hr, 2)
             # mark the spot as available again
             spot.status = 'A'
+            # Update LotBooking for the lot and date
+            booking_date = reservation.parking_time.date()
+            lot_booking = LotBooking.query.filter_by(lot_id=spot.lot_id, booking_date=booking_date).first()
+            if lot_booking and lot_booking.spots_booked > 0:
+                lot_booking.spots_booked -= 1
             # save the changes
             db.session.commit()
             flash(f"Spot released. Total cost: ₹{reservation.cost:.2f}", 'success')
