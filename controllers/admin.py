@@ -375,28 +375,48 @@ def delete_lot(lot_id):
         return redirect(url_for('authorisation.login'))
     # find the lot to delete
     lot = ParkingLot.query.get(lot_id)
+    if not lot:
+        flash("Parking lot not found.", 'error')
+        return redirect(url_for('admin.lots'))
+
     # Check for any reservations for any spot in this lot
     from models.reservation import Reservation
     from models.parking_spot import ParkingSpot
+    from models.lot_bookings import LotBooking
+
     reservations = Reservation.query.join(ParkingSpot).filter(ParkingSpot.lot_id == lot_id).all()
     if reservations:
         # Only allow deletion if all reservations are cancelled or completed
         if not all(r.status in ['C', 'X'] for r in reservations):
-            flash("Lot can't be deleted if it has reservations.", 'error')
+            flash("Lot can't be deleted if it has active or upcoming reservations.", 'error')
             return redirect(url_for('admin.lots'))
+
     # i don't want to delete a lot if there are cars in it, so i check for that
     spots_occupied = ParkingSpot.query.filter_by(lot_id=lot_id, status='O').count()
     if spots_occupied > 0:
         flash("Lot cannot be deleted because it contains occupied spots.", 'error')
         return redirect(url_for('admin.lots'))
+
     try:
-        # delete the reservations associated with the lot
+        # Delete associated reservations
         for reservation in reservations:
             db.session.delete(reservation)
-        # delete the lot from the database
+
+        # Delete associated lot bookings
+        lot_bookings = LotBooking.query.filter_by(lot_id=lot_id).all()
+        for booking in lot_bookings:
+            db.session.delete(booking)
+
+        # Delete associated parking spots
+        parking_spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
+        for spot in parking_spots:
+            db.session.delete(spot)
+
+        # Now, delete the lot itself
         db.session.delete(lot)
+        
         db.session.commit()
-        flash("Parking lot deleted successfully!", 'success')
+        flash("Parking lot and all its associated data deleted successfully!", 'success')
     except Exception as e:
         # if something goes wrong, show an error
         db.session.rollback()
