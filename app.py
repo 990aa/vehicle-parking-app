@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import Flask, jsonify, request
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from dotenv import load_dotenv
-from extensions import db, cache
+from extensions import db, cache, mail
 from models.user import User, Role
 from controllers.user import user
 from controllers.admin import admin
@@ -12,6 +12,7 @@ from controllers.check import check
 from security import user_datastore, security, jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restx import Api, Resource, Namespace, fields
+from jobs import schedule_jobs
 
 load_dotenv()
 
@@ -26,10 +27,23 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 app.config['CACHE_TYPE'] = 'SimpleCache'
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
+# Email configuration
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+
+# Twilio configuration
+app.config['TWILIO_ACCOUNT_SID'] = os.getenv('TWILIO_ACCOUNT_SID')
+app.config['TWILIO_AUTH_TOKEN'] = os.getenv('TWILIO_AUTH_TOKEN')
+app.config['TWILIO_FROM_NUMBER'] = os.getenv('TWILIO_FROM_NUMBER')
+
 db.init_app(app)
 security.init_app(app, user_datastore)
 jwt.init_app(app)
 cache.init_app(app)
+mail.init_app(app)
 
 # Flask-RESTX API setup
 api = Api(app, version='1.0', title='Vehicle Parking API',
@@ -108,4 +122,5 @@ def index():
 
 
 if __name__ == '__main__':
+    schedule_jobs(app)
     app.run(debug=True)
