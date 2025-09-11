@@ -1,0 +1,56 @@
+{% extends "main.html" %}
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#" style="font-size: 1.6rem;">Vehicle Parking App</a>
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('user.user_dashboard') }}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('user.user_booking') }}">Book Spot</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('user.user_history') }}">History</a>
+      </li>
+    </ul>
+    <a href="{{ url_for('authorisation.logout') }}" class="btn btn-outline-light">Logout</a>
+  </div>
+</nav>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">Payment Portal</div>
+        <div class="card-body">
+          <h5 class="mb-3">Pay for Reservation #{{ reservation.id }}</h5>
+          <p><b>Lot:</b> {{ lot_name }}<br>
+             <b>Spot:</b> #{{ spot_no }}<br>
+             <b>Amount Due:</b> ₹{{ amount_due }}</p>
+          <form method="post" action="{{ url_for('user.payment', reservation_id=reservation.id) }}">
+            <div class="mb-3">
+              <label for="cardNumber" class="form-label">Card Number</label>
+              <input type="text" class="form-control" id="cardNumber" name="card_number" maxlength="19" required placeholder="1234 5678 9012 3456">
+            </div>
+            <div class="mb-3 row">
+              <div class="col">
+                <label for="expiry" class="form-label">Expiry</label>
+                <input type="text" class="form-control" id="expiry" name="expiry" maxlength="5" required placeholder="MM/YY">
+              </div>
+              <div class="col">
+                <label for="cvv" class="form-label">CVV</label>
+                <input type="password" class="form-control" id="cvv" name="cvv" maxlength="4" required placeholder="123">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">Name on Card</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Pay Now</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

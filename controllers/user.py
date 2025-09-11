@@ -1,29 +1,14 @@
-# all the things i need for this file to work
+from jobs import export_user_parking_csv
 from flask import Blueprint, redirect, url_for, flash, request, render_template, send_file, jsonify
 from flask_security import auth_required, current_user
-# my database helper
 from extensions import db, cache
-
-# this is the user controller, for all the user pages
 user = Blueprint('user', __name__)
-from jobs import export_user_parking_csv
-# Export as CSV endpoint (user-triggered async job)
-@user.route('/user/export_csv', methods=['POST'])
-@auth_required('token')
-def export_csv():
-    export_user_parking_csv.delay(current_user.id, current_user.email)
-    flash('Your export is being processed. You will receive an email when it is ready.', 'info')
-    return redirect(url_for('user.user_dashboard'))
-# all the data models i need to talk to
 from models.parking_lot import ParkingLot
 from models.reservation import Reservation
 from models.parking_spot import ParkingSpot
 from models.lot_bookings import LotBooking
-# for time stuff
 from datetime import datetime, date
-# for rounding up numbers
 from math import ceil
-# for the pretty charts
 import plotly.graph_objs as plt
 import plotly.io as pltio
 
@@ -567,3 +552,43 @@ def user_history():
             history.append(rec)
     # send the history to the html page
     return render_template('user_history.html', history=history, search_query=query, search_field=field, status_filter=status_filter)
+
+
+@user.route('/user/payment/<int:reservation_id>', methods=['GET', 'POST'])
+@auth_required('token')
+def payment(reservation_id):
+    reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
+    if not reservation:
+        flash('Reservation not found.', 'error')
+        return redirect(url_for('user.user_dashboard'))
+    spot = ParkingSpot.query.get(reservation.spot_id)
+    lot = ParkingLot.query.get(spot.lot_id) if spot else None
+    lot_name = lot.prime_location_name if lot else '-'
+    spot_no = spot.spot_no if spot else '-'
+    amount_due = reservation.cost if reservation.cost is not None else 0
+    if request.method == 'POST':
+        # Dummy payment processing
+        card_number = request.form.get('card_number')
+        expiry = request.form.get('expiry')
+        cvv = request.form.get('cvv')
+        name = request.form.get('name')
+        # In real app, validate and process payment here
+        flash('Payment successful! Thank you.', 'success')
+        return redirect(url_for('user.user_dashboard'))
+    return render_template('payment_portal.html', reservation=reservation, lot_name=lot_name, spot_no=spot_no, amount_due=amount_due)
+
+
+# Export as CSV endpoint (user-triggered async job)
+@user.route('/user/export_csv', methods=['POST'])
+@auth_required('token')
+def export_csv():
+    export_user_parking_csv.delay(current_user.id, current_user.email)
+    flash('Your export is being processed. You will receive an email when it is ready.', 'info')
+    return redirect(url_for('user.user_dashboard'))
+
+@user.route('/user/export_csv', methods=['POST'])
+@auth_required('token')
+def export_csv():
+    export_user_parking_csv.delay(current_user.id, current_user.email)
+    flash('Your export is being processed. You will receive an email when it is ready.', 'info')
+    return redirect(url_for('user.user_dashboard'))
