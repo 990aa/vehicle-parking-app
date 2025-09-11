@@ -1,5 +1,6 @@
 ideas.txt
 .env
+TODO.txt
 instance/
 controllers/__pycache__/
 models/__pycache__/

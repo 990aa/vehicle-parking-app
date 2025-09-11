@@ -12,7 +12,7 @@ from controllers.check import check
 from security import user_datastore, security, jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restx import Api, Resource, Namespace, fields
-from jobs import schedule_jobs
+
 
 load_dotenv()
 
@@ -56,9 +56,9 @@ def create_app():
         result_backend=app.config['CELERY_RESULT_BACKEND']
     )
     celery.conf.beat_schedule = {
-        'run-every-30-seconds': {
-            'task': 'jobs.scheduled_job',
-            'schedule': 30.0
+        'monthly-activity-report': {
+            'task': 'jobs.send_monthly_activity_report',
+            'schedule': {"type": "crontab", "minute": 0, "hour": 8, "day_of_month": 1},
         },
     }
 
