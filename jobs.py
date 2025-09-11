@@ -43,6 +43,12 @@ def send_monthly_activity_report():
     Celery scheduled task: Sends a monthly HTML activity report to each user via email.
     """
     from app import create_app
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
+    import io
     app = create_app()
     with app.app_context():
         from models.user import User
@@ -73,35 +79,76 @@ def send_monthly_activity_report():
                 lot_name = lot.prime_location_name if lot else 'Unknown'
                 lot_counts[lot_name] = lot_counts.get(lot_name, 0) + 1
             most_used_lot = max(lot_counts, key=lot_counts.get) if lot_counts else 'N/A'
-            # HTML report
-            html = render_template_string('''
-                <h2>Monthly Parking Activity Report - {{ month_name }} {{ year }}</h2>
-                <p>Hello {{ user.username }},</p>
-                <p>Here is your parking activity summary for <b>{{ month_name }} {{ year }}</b>:</p>
-                <ul>
-                    <li><b>Total Bookings:</b> {{ total_bookings }}</li>
-                    <li><b>Most Used Parking Lot:</b> {{ most_used_lot }}</li>
-                    <li><b>Total Amount Spent:</b> ₹{{ '%.2f' % total_spent }}</li>
-                </ul>
-                {% if reservations %}
-                <h4>Booking Details:</h4>
-                <table border="1" cellpadding="5" cellspacing="0">
-                    <tr><th>Date</th><th>Lot</th><th>Spot</th><th>Cost</th></tr>
-                    {% for r in reservations %}
-                    <tr>
-                        <td>{{ r.parking_time.strftime('%d-%m-%Y') if r.parking_time else '-' }}</td>
-                        <td>{{ r.spot.parking_lot.prime_location_name if r.spot and r.spot.parking_lot else 'Unknown' }}</td>
-                        <td>{{ r.spot.spot_no if r.spot else '-' }}</td>
-                        <td>₹{{ '%.2f' % (r.cost or 0) }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% else %}
-                <p>No bookings found for this month.</p>
-                {% endif %}
+
+            # Generate PDF report
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            styles = getSampleStyleSheet()
+            elements = []
+            title = Paragraph(f"<b>Monthly Parking Activity Report - {month_name} {year}</b>", styles['Title'])
+            elements.append(title)
+            elements.append(Spacer(1, 12))
+            elements.append(Paragraph(f"Hello {user.username},", styles['Normal']))
+            elements.append(Paragraph(f"Here is your parking activity summary for <b>{month_name} {year}</b>:", styles['Normal']))
+            elements.append(Spacer(1, 12))
+            summary_data = [
+                ["Total Bookings", total_bookings],
+                ["Most Used Parking Lot", most_used_lot],
+                ["Total Amount Spent", f"₹{total_spent:.2f}"]
+            ]
+            summary_table = Table(summary_data, hAlign='LEFT')
+            summary_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(summary_table)
+            elements.append(Spacer(1, 18))
+            if reservations:
+                elements.append(Paragraph("<b>Booking Details:</b>", styles['Heading4']))
+                data = [["Date", "Lot", "Spot", "Cost"]]
+                for r in reservations:
+                    data.append([
+                        r.parking_time.strftime('%d-%m-%Y') if r.parking_time else '-',
+                        r.spot.parking_lot.prime_location_name if r.spot and r.spot.parking_lot else 'Unknown',
+                        r.spot.spot_no if r.spot else '-',
+                        f"₹{(r.cost or 0):.2f}"
+                    ])
+                table = Table(data, hAlign='LEFT')
+                table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ]))
+                elements.append(table)
+            else:
+                elements.append(Paragraph("No bookings found for this month.", styles['Normal']))
+            elements.append(Spacer(1, 18))
+            elements.append(Paragraph("Thank you for using Vehicle Parking App!", styles['Normal']))
+            doc.build(elements)
+            pdf = buffer.getvalue()
+            buffer.close()
+
+            # Email with PDF attachment
+            html = f"""
+                <h2>Monthly Parking Activity Report - {month_name} {year}</h2>
+                <p>Hello {user.username},</p>
+                <p>Your monthly activity report is attached as a PDF.</p>
                 <p>Thank you for using Vehicle Parking App!</p>
-            ''', user=user, month_name=month_name, year=year, total_bookings=total_bookings, most_used_lot=most_used_lot, total_spent=total_spent, reservations=reservations)
-            send_email(user.email, f"Your {month_name} {year} Parking Activity Report", html, html=True)
+            """
+            msg = Message(f"Your {month_name} {year} Parking Activity Report", recipients=[user.email])
+            msg.body = f"Dear {user.username},\n\nYour monthly activity report is attached as a PDF.\n\nThank you for using Vehicle Parking App!"
+            msg.html = html
+            msg.attach(f"Parking_Report_{month_name}_{year}.pdf", "application/pdf", pdf)
+            mail.send(msg)
 from datetime import datetime, timedelta
 from flask_mail import Message
 from twilio.rest import Client
