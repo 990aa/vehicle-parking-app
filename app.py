@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import Flask, jsonify
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from dotenv import load_dotenv
-from extensions import db
+from extensions import db, cache
 from models.user import User, Role
 from controllers.user import user
 from controllers.admin import admin
@@ -21,10 +21,13 @@ app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT', 'fall
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback_jwt_secret')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['CACHE_TYPE'] = 'SimpleCache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
 db.init_app(app)
 security.init_app(app, user_datastore)
 jwt.init_app(app)
+cache.init_app(app)
 
 app.register_blueprint(user)
 app.register_blueprint(admin)

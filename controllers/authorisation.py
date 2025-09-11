@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from flask_jwt_extended import create_access_token
 from flask_security import auth_required, roles_required, current_user
 from security import user_datastore
+from extensions import db
 
 authorisation = Blueprint('authorisation', __name__)
 
