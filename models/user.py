@@ -19,6 +19,9 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
     time = db.Column(db.DateTime, default=datetime.now)
+    notification_preference = db.Column(db.String(10), default='email')
+    notification_contact = db.Column(db.String(100))
+    last_notified = db.Column(db.DateTime)
     reservations = db.relationship('Reservation', backref='user')
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
