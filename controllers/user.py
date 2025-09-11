@@ -1,11 +1,19 @@
 # all the things i need for this file to work
-from flask import Blueprint, redirect, url_for, flash, request, render_template
+from flask import Blueprint, redirect, url_for, flash, request, render_template, send_file, jsonify
 from flask_security import auth_required, current_user
 # my database helper
 from extensions import db, cache
 
 # this is the user controller, for all the user pages
 user = Blueprint('user', __name__)
+from jobs import export_user_parking_csv
+# Export as CSV endpoint (user-triggered async job)
+@user.route('/user/export_csv', methods=['POST'])
+@auth_required('token')
+def export_csv():
+    export_user_parking_csv.delay(current_user.id, current_user.email)
+    flash('Your export is being processed. You will receive an email when it is ready.', 'info')
+    return redirect(url_for('user.user_dashboard'))
 # all the data models i need to talk to
 from models.parking_lot import ParkingLot
 from models.reservation import Reservation

@@ -1,3 +1,40 @@
+import csv
+import io
+@celery.task(name='jobs.export_user_parking_csv')
+def export_user_parking_csv(user_id, user_email):
+    """
+    Celery task: Exports all parking spot usage for a user as CSV and emails a download link or file.
+    """
+    from app import create_app
+    app = create_app()
+    with app.app_context():
+        from models.reservation import Reservation
+        from models.parking_spot import ParkingSpot
+        from models.parking_lot import ParkingLot
+        user_reservations = Reservation.query.filter_by(user_id=user_id).order_by(Reservation.parking_time.asc()).all()
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['Reservation ID', 'Lot Name', 'Spot No', 'Parking Time', 'Leaving Time', 'Vehicle Number', 'Cost', 'Status'])
+        for r in user_reservations:
+            lot_name = r.spot.parking_lot.prime_location_name if r.spot and r.spot.parking_lot else '-'
+            spot_no = r.spot.spot_no if r.spot else '-'
+            writer.writerow([
+                r.id,
+                lot_name,
+                spot_no,
+                r.parking_time.strftime('%Y-%m-%d %H:%M') if r.parking_time else '-',
+                r.leaving_time.strftime('%Y-%m-%d %H:%M') if r.leaving_time else '-',
+                r.vehicle_number,
+                r.cost if r.cost is not None else '-',
+                r.status
+            ])
+        csv_data = output.getvalue()
+        output.close()
+        # Email the CSV as an attachment
+        msg = Message('Your Parking Spot Usage Export', recipients=[user_email])
+        msg.body = 'Attached is your parking spot usage export as requested.'
+        msg.attach('parking_spots_export.csv', 'text/csv', csv_data)
+        mail.send(msg)
 from flask import render_template_string
 # Celery task for monthly activity report
 @celery.task(name='jobs.send_monthly_activity_report')

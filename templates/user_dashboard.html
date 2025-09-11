@@ -29,7 +29,12 @@
 </nav>
 <div class="page active" id="userDashboard">
     <!-- dashboard for user, checked variable names match backend, compared with admin dashboard -->
-    <div class="row mb-4">
+  <div class="row mb-4">
+    <div class="col-12 mb-2">
+      <form method="post" action="{{ url_for('user.export_csv') }}">
+        <button type="submit" class="btn btn-outline-primary">Export Parking Usage as CSV</button>
+      </form>
+    </div>
         <div class="col-md-4">
             <div class="stat-card">
                 <div>
