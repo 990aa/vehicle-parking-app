@@ -9,3 +9,5 @@ migrations/
 .venv/
 .venv-1/
 __pycache__/
+*node_modules/
+
