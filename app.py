@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from dotenv import load_dotenv
 from extensions import db, cache
@@ -11,8 +11,10 @@ from controllers.authorisation import authorisation
 from controllers.check import check
 from security import user_datastore, security, jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_restx import Api, Resource, Namespace, fields
 
 load_dotenv()
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///parking.db'
@@ -28,6 +30,56 @@ db.init_app(app)
 security.init_app(app, user_datastore)
 jwt.init_app(app)
 cache.init_app(app)
+
+# Flask-RESTX API setup
+api = Api(app, version='1.0', title='Vehicle Parking API',
+          description='API documentation for Vehicle Parking App',
+          doc='/api/docs')
+
+# Namespaces for API endpoints
+auth_ns = Namespace('auth', description='Authentication operations')
+user_ns = Namespace('user', description='User operations')
+admin_ns = Namespace('admin', description='Admin operations')
+
+# Models for API documentation
+login_model = auth_ns.model('Login', {
+    'email': fields.String(required=True),
+    'password': fields.String(required=True)
+})
+
+token_model = auth_ns.model('Token', {
+    'access_token': fields.String()
+})
+
+# API Endpoints using Flask-RESTX
+@auth_ns.route('/token')
+class TokenResource(Resource):
+    @auth_ns.expect(login_model)
+    @auth_ns.response(200, 'Success', token_model)
+    @auth_ns.response(401, 'Bad email or password')
+    def post(self):
+        """Create JWT token"""
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        user = user_datastore.find_user(email=email)
+        if user and user.password == password:
+            access_token = create_access_token(identity=user.id)
+            return {'access_token': access_token}, 200
+        return {'msg': 'Bad email or password'}, 401
+
+@user_ns.route('/')
+class UserResource(Resource):
+    @jwt_required()
+    def get(self):
+        """Get current user info"""
+        current_user_id = get_jwt_identity()
+        user = user_datastore.find_user(id=current_user_id)
+        return {'logged_in_as': user.email}, 200
+
+api.add_namespace(auth_ns, path='/api/auth')
+api.add_namespace(user_ns, path='/api/user')
+api.add_namespace(admin_ns, path='/api/admin')
 
 app.register_blueprint(user)
 app.register_blueprint(admin)
@@ -48,30 +100,12 @@ def before_first_request():
             db.session.commit()
         app.already_ran_before_first_request = True
 
+
+# Optionally, you can add a root endpoint for health check or landing
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        if current_user.has_role('admin'):
-            return jsonify({"message": "Welcome admin"})
-        return jsonify({"message": "Welcome user"})
-    return jsonify({"message": "Welcome guest"})
+    return jsonify({"message": "Vehicle Parking App API"})
 
-@app.route('/api/token', methods=['POST'])
-def create_token():
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
-    user = user_datastore.find_user(email=email)
-    if user and user.password == password:
-        access_token = create_access_token(identity=user.id)
-        return jsonify(access_token=access_token)
-    return jsonify({"msg": "Bad email or password"}), 401
-
-@app.route('/api/user', methods=['GET'])
-@jwt_required()
-def get_user():
-    current_user_id = get_jwt_identity()
-    user = user_datastore.find_user(id=current_user_id)
-    return jsonify(logged_in_as=user.email), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
