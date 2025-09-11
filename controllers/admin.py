@@ -1,5 +1,3 @@
-
-# all the things i need to import for this to work
 from flask import render_template, redirect, request, url_for, flash, Blueprint
 from flask_security import auth_required, roles_required
 # for the pretty charts
@@ -21,8 +19,8 @@ from math import ceil
 # this is the admin controller, so all the admin pages are here
 admin = Blueprint('admin', __name__)
 
-@admin.route('/admin/dashboard')
-@auth_required('token')
+@admin.route('//dashboard')
+@auth_required()
 @roles_required('admin')
 def admin_dashboard():
     # ok so i wanted to page this but then the chart broke, so just get all for now
@@ -168,8 +166,8 @@ def admin_dashboard():
 
 
 # this page shows all the users
-@admin.route('/admin/users')
-@auth_required('token')
+@admin.route('//users')
+@auth_required()
 @roles_required('admin')
 @cache.cached(timeout=50)
 def admin_users():
@@ -215,8 +213,8 @@ def admin_users():
 
 # this page shows all the parking history for one user
 # Admin: View user activity/history
-@admin.route('/admin/user/<int:user_id>/activity')
-@auth_required('token')
+@admin.route('//user/<int:user_id>/activity')
+@auth_required()
 @roles_required('admin')
 def admin_user_activity(user_id):
     # find the user in the database
@@ -244,8 +242,8 @@ def admin_user_activity(user_id):
     return render_template('admin_user_activity.html', user=user, reservations=reservations, now=now, total_earned=total_earned)
 
 # this is for deleting a user
-@admin.route('/admin/users/delete/<int:user_id>', methods=['POST'])
-@auth_required('token')
+@admin.route('//users/delete/<int:user_id>', methods=['POST'])
+@auth_required()
 @roles_required('admin')
 def delete_user(user_id):
     # find the user to delete
@@ -265,8 +263,8 @@ def delete_user(user_id):
     return redirect(url_for('admin.admin_dashboard'))
 
 # this page is for creating a new parking lot
-@admin.route('/admin/lots/create', methods=['GET', 'POST'])
-@auth_required('token')
+@admin.route('//lots/create', methods=['GET', 'POST'])
+@auth_required()
 @roles_required('admin')
 def create_lot():
     # if the form is submitted, create the lot
@@ -302,8 +300,8 @@ def create_lot():
 
 
 # this page shows all the parking lots
-@admin.route('/admin/lots')
-@auth_required('token')
+@admin.route('//lots')
+@auth_required()
 @roles_required('admin')
 @cache.cached(timeout=50)
 def lots():
@@ -364,8 +362,8 @@ def lots():
 
 
 # this is for deleting a parking lot
-@admin.route('/admin/lots/delete/<int:lot_id>', methods=['POST'])
-@auth_required('token')
+@admin.route('//lots/delete/<int:lot_id>', methods=['POST'])
+@auth_required()
 @roles_required('admin')
 def delete_lot(lot_id):
     # find the lot to delete
@@ -421,8 +419,8 @@ def delete_lot(lot_id):
 
 
 # this page is for editing a parking lot
-@admin.route('/admin/lots/edit/<int:lot_id>', methods=['GET', 'POST'])
-@auth_required('token')
+@admin.route('//lots/edit/<int:lot_id>', methods=['GET', 'POST'])
+@auth_required()
 @roles_required('admin')
 def edit_lot(lot_id):
     # find the lot to edit
@@ -475,8 +473,8 @@ def edit_lot(lot_id):
 
 # this is for adding a new spot to a lot
 # parking spot management (moved from admin_spots.py)
-@admin.route('/admin/lot/<int:lot_id>/add_spot', methods=['POST'])
-@auth_required('token')
+@admin.route('//lot/<int:lot_id>/add_spot', methods=['POST'])
+@auth_required()
 @roles_required('admin')
 def add_spot(lot_id):
     # find the lot to add a spot to
@@ -497,8 +495,8 @@ def add_spot(lot_id):
     return redirect(url_for('admin.view_spots', lot_id=lot_id))
 
 # this page shows all the spots in a lot
-@admin.route('/admin/lot/<int:lot_id>/spots')
-@auth_required('token')
+@admin.route('//lot/<int:lot_id>/spots')
+@auth_required()
 @roles_required('admin')
 def view_spots(lot_id):
     # find the lot we're looking at
@@ -572,8 +570,8 @@ def view_spots(lot_id):
 
 # this page shows the history of a single parking spot
 # Admin: View full history of a parking spot
-@admin.route('/admin/spot/<int:spot_id>')
-@auth_required('token')
+@admin.route('//spot/<int:spot_id>')
+@auth_required()
 @roles_required('admin')
 def spot_history(spot_id):
     # find the spot we're looking at
@@ -632,8 +630,8 @@ def spot_history(spot_id):
     return render_template('admin_spot_history.html', spot=spot, active=active, completed=completed, upcoming=upcoming, cancelled=cancelled)
 
 # this is for deleting a parking spot
-@admin.route('/admin/spot/delete/<int:spot_id>', methods=['POST'])
-@auth_required('token')
+@admin.route('//spot/delete/<int:spot_id>', methods=['POST'])
+@auth_required()
 @roles_required('admin')
 def delete_spot(spot_id):
     # find the spot to delete
@@ -663,8 +661,8 @@ def delete_spot(spot_id):
     return redirect(request.referrer or url_for('admin.lots'))
 
 # Revenue records page for admin
-@admin.route('/admin/revenue')
-@auth_required('token')
+@admin.route('//revenue')
+@auth_required()
 @roles_required('admin')
 def revenue():
     # Get all completed reservations (status 'C')

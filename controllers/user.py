@@ -14,8 +14,8 @@ import plotly.io as pltio
 
 
 # this is the main user page, the dashboard
-@user.route('/user/dashboard')
-@auth_required('token')
+@user.route('//dashboard')
+@auth_required()
 def user_dashboard():
     #import plotly.graph_objs as plt
     #import plotly.io as pltio
@@ -189,11 +189,10 @@ def user_dashboard():
     )
 
 # this page is for booking a new spot
-@user.route('/user/booking')
-@auth_required('token')
+@user.route('//booking')
+@auth_required()
 @cache.cached(timeout=50)
 def user_booking():
-    # get ready to show the parking lots
     from datetime import date
     lots = []
     today = date.today().strftime('%Y-%m-%d')
@@ -209,17 +208,11 @@ def user_booking():
         selected_dt = datetime.strptime(selected_date, '%Y-%m-%d').date()
     except Exception:
         selected_dt = date.today()
-    # i don't want people booking in the past
-    # Only allow today or future dates
     if selected_dt < date.today():
         selected_dt = date.today()
         selected_date = today
-    # get all the parking lots
     for lot in ParkingLot.query.all():
-        # count how many spots are in each lot
         total_spots = ParkingSpot.query.filter_by(lot_id=lot.id).count()
-        # see how many spots are booked for the selected date
-        # Use LotBooking to get spots booked for this lot and date
         lot_booking = LotBooking.query.filter_by(lot_id=lot.id, booking_date=selected_dt).first()
         spots_booked = lot_booking.spots_booked if lot_booking else 0
         # calculate how many spots are available
@@ -256,8 +249,8 @@ def user_booking():
     return render_template('user_booking.html', lots=lots, lot_search_query=lot_query, lot_search_field=lot_field, selected_date=selected_date, today=today)
 
 # this is for when a user clicks the "book" button
-@user.route('/user/book_spot/<int:lot_id>', methods=['POST'])
-@auth_required('token')
+@user.route('//book_spot/<int:lot_id>', methods=['POST'])
+@auth_required()
 def book_spot(lot_id):
     # get the user's id and the date they want to book
     user_id = current_user.id
@@ -327,8 +320,8 @@ def book_spot(lot_id):
     return redirect(url_for('user.user_dashboard'))
 
 # this is for when a user arrives at the parking lot and marks their car as parked
-@user.route('/user/mark_parked/<int:reservation_id>', methods=['GET', 'POST'])
-@auth_required('token')
+@user.route('//mark_parked/<int:reservation_id>', methods=['GET', 'POST'])
+@auth_required()
 def mark_parked(reservation_id):
     # find the reservation
     reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
@@ -359,8 +352,8 @@ def mark_parked(reservation_id):
     return redirect(url_for('user.user_dashboard'))
 
 # this is for when a user leaves the parking lot and releases their spot
-@user.route('/user/release_spot/<int:reservation_id>', methods = ['GET', 'POST'])
-@auth_required('token')
+@user.route('//release_spot/<int:reservation_id>', methods = ['GET', 'POST'])
+@auth_required()
 def release_spot(reservation_id):
     # find the reservation
     reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
@@ -409,8 +402,8 @@ def release_spot(reservation_id):
     return redirect(url_for('user.user_dashboard'))
 
 # this is for when a user cancels a reservation
-@user.route('/user/cancel_reservation/<int:reservation_id>', methods=['POST'])
-@auth_required('token')
+@user.route('//cancel_reservation/<int:reservation_id>', methods=['POST'])
+@auth_required()
 def cancel_reservation(reservation_id):
     # find the reservation
     res = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
@@ -442,8 +435,8 @@ def cancel_reservation(reservation_id):
     return redirect(url_for('user.user_dashboard'))
 
 # this page shows the user's parking history
-@user.route('/user/history')
-@auth_required('token')
+@user.route('//history')
+@auth_required()
 def user_history():
     # get the user's id
     user_id = current_user.id
@@ -554,8 +547,8 @@ def user_history():
     return render_template('user_history.html', history=history, search_query=query, search_field=field, status_filter=status_filter)
 
 
-@user.route('/user/payment/<int:reservation_id>', methods=['GET', 'POST'])
-@auth_required('token')
+@user.route('//payment/<int:reservation_id>', methods=['GET', 'POST'])
+@auth_required()
 def payment(reservation_id):
     reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
     if not reservation:
@@ -579,8 +572,8 @@ def payment(reservation_id):
 
 
 
-@user.route('/user/export_csv', methods=['POST'])
-@auth_required('token')
+@user.route('//export_csv', methods=['POST'])
+@auth_required()
 def export_csv():
     export_user_parking_csv.delay(current_user.id, current_user.email)
     flash('Your export is being processed. You will receive an email when it is ready.', 'info')

@@ -28,6 +28,8 @@ def login():
         access_token = create_access_token(identity=user.id)
         
         if not request.is_json:
+            if user.has_role('admin'):
+                return redirect(url_for('admin.admin_dashboard'))
             return redirect(url_for('user.user_dashboard'))
         return jsonify(access_token=access_token)
     

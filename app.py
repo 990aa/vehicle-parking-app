@@ -14,9 +14,28 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from flask_restx import Api, Resource, Namespace, fields
 
 
+import logging
+from flask.logging import default_handler
+
+# ... (imports)
+
+# Remove the default handler
+logging.root.removeHandler(default_handler)
+
+# Create a new handler with the desired format
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(message)s')
+handler.setFormatter(formatter)
+
+# Add the new handler to the root logger
+logging.root.addHandler(handler)
+logging.root.setLevel(logging.INFO)
+
 load_dotenv()
 
 def create_app():
+    # ... (rest of the function)
+
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///parking.db'
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback_secret_key')
@@ -114,8 +133,8 @@ def create_app():
     api.add_namespace(admin_ns, path='/api/admin')
 
 
-    app.register_blueprint(user)
-    app.register_blueprint(admin)
+    app.register_blueprint(user, url_prefix='/user')
+    app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(authorisation)
     app.register_blueprint(check)
 
@@ -140,4 +159,13 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    
+    # Configure logging
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(message)s')
+    handler.setFormatter(formatter)
+    app.logger.handlers.clear()
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.INFO)
+    
+    app.run(host='0.0.0.0', port=5000, debug=True)
