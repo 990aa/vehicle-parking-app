@@ -1,7 +1,7 @@
 
 # all the things i need to import for this to work
 from flask import render_template, redirect, request, url_for, flash, Blueprint
-from flask import session
+from flask_security import auth_required, roles_required
 # for the pretty charts
 import plotly.graph_objs as plt
 import plotly.io as pltio
@@ -22,10 +22,9 @@ from math import ceil
 admin = Blueprint('admin', __name__)
 
 @admin.route('/admin/dashboard')
+@auth_required('token')
+@roles_required('admin')
 def admin_dashboard():
-    # if you're not an admin, you can't be here
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # ok so i wanted to page this but then the chart broke, so just get all for now
     # get all the parking lots from the database
     lots = ParkingLot.query.all()
@@ -116,7 +115,7 @@ def admin_dashboard():
     # get all the reservations and sort them into different lists
     # --- Reservation tables for admin ---
     # Active: status='A', Completed: status='C', Upcoming: status='U' and parking_time in future
-    from sqlalchemy import and_, or_
+    from sqlalchemy import and_, or_ 
     now = datetime.now()
     active_reservations = Reservation.query.filter(
         and_(Reservation.status == 'A', Reservation.parking_time <= now)
@@ -170,10 +169,9 @@ def admin_dashboard():
 
 # this page shows all the users
 @admin.route('/admin/users')
+@auth_required('token')
+@roles_required('admin')
 def admin_users():
-    # only admins can see this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # this is for the search bar, so i can find users
     query = request.args.get('q', '').strip().lower()
     field = request.args.get('field', 'all')
@@ -217,10 +215,9 @@ def admin_users():
 # this page shows all the parking history for one user
 # Admin: View user activity/history
 @admin.route('/admin/user/<int:user_id>/activity')
+@auth_required('token')
+@roles_required('admin')
 def admin_user_activity(user_id):
-    # only admins allowed
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the user in the database
     user = User.query.get(user_id)
     # if the user doesn't exist, show an error
@@ -247,10 +244,9 @@ def admin_user_activity(user_id):
 
 # this is for deleting a user
 @admin.route('/admin/users/delete/<int:user_id>', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
 def delete_user(user_id):
-    # only admins can do this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the user to delete
     user = User.query.get(user_id)
     # i don't want to delete other admins, so i check for that
@@ -269,10 +265,9 @@ def delete_user(user_id):
 
 # this page is for creating a new parking lot
 @admin.route('/admin/lots/create', methods=['GET', 'POST'])
+@auth_required('token')
+@roles_required('admin')
 def create_lot():
-    # only admins can create lots
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # if the form is submitted, create the lot
     if request.method == 'POST':
         try:
@@ -307,10 +302,9 @@ def create_lot():
 
 # this page shows all the parking lots
 @admin.route('/admin/lots')
+@auth_required('token')
+@roles_required('admin')
 def lots():
-    # only admins can see this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # for the search bar
     query = request.args.get('q', '').strip().lower()
     field = request.args.get('field', 'all')
@@ -369,10 +363,9 @@ def lots():
 
 # this is for deleting a parking lot
 @admin.route('/admin/lots/delete/<int:lot_id>', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
 def delete_lot(lot_id):
-    # only admins can do this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the lot to delete
     lot = ParkingLot.query.get(lot_id)
     if not lot:
@@ -427,10 +420,9 @@ def delete_lot(lot_id):
 
 # this page is for editing a parking lot
 @admin.route('/admin/lots/edit/<int:lot_id>', methods=['GET', 'POST'])
+@auth_required('token')
+@roles_required('admin')
 def edit_lot(lot_id):
-    # only admins can edit lots
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the lot to edit
     lot = ParkingLot.query.get(lot_id)
     # if the form is submitted, update the lot
@@ -482,10 +474,9 @@ def edit_lot(lot_id):
 # this is for adding a new spot to a lot
 # parking spot management (moved from admin_spots.py)
 @admin.route('/admin/lot/<int:lot_id>/add_spot', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
 def add_spot(lot_id):
-    # only admins can do this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the lot to add a spot to
     lot = ParkingLot.query.get(lot_id)
     if not lot:
@@ -505,10 +496,9 @@ def add_spot(lot_id):
 
 # this page shows all the spots in a lot
 @admin.route('/admin/lot/<int:lot_id>/spots')
+@auth_required('token')
+@roles_required('admin')
 def view_spots(lot_id):
-    # only admins can see this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the lot we're looking at
     lot = ParkingLot.query.get(lot_id)
     if not lot:
@@ -581,10 +571,9 @@ def view_spots(lot_id):
 # this page shows the history of a single parking spot
 # Admin: View full history of a parking spot
 @admin.route('/admin/spot/<int:spot_id>')
+@auth_required('token')
+@roles_required('admin')
 def spot_history(spot_id):
-    # only admins can see this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the spot we're looking at
     spot = ParkingSpot.query.get(spot_id)
     if not spot:
@@ -642,10 +631,9 @@ def spot_history(spot_id):
 
 # this is for deleting a parking spot
 @admin.route('/admin/spot/delete/<int:spot_id>', methods=['POST'])
+@auth_required('token')
+@roles_required('admin')
 def delete_spot(spot_id):
-    # only admins can do this
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # find the spot to delete
     spot = ParkingSpot.query.get(spot_id)
     if not spot:
@@ -674,9 +662,9 @@ def delete_spot(spot_id):
 
 # Revenue records page for admin
 @admin.route('/admin/revenue')
+@auth_required('token')
+@roles_required('admin')
 def revenue():
-    if 'user_id' not in session or session.get('role') != 'admin':
-        return redirect(url_for('authorisation.login'))
     # Get all completed reservations (status 'C')
     completed_reservations = Reservation.query.filter_by(status='C').all()
     revenue_records = []

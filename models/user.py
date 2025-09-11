@@ -1,22 +1,25 @@
-# my database helper
 from extensions import db
-# for time stuff
 from datetime import datetime
+from flask_security import UserMixin, RoleMixin
 
-# this is the data model for a user
-class User(db.Model):
-    # the unique id for each user
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    # the user's username, has to be unique
     username = db.Column(db.String(50), unique=True, nullable=False)
-    # the user's email, also has to be unique
     email = db.Column(db.String(100), unique=True, nullable=False)
-    # the user's password, i should probably hash this but i'm lazy
-    password = db.Column(db.String(50), nullable=False)
-    # is the user an admin or a regular user?
-    role = db.Column(db.String(5), default = "user", nullable=False)
-    # when the user was created
+    password = db.Column(db.String(255), nullable=False)
+    active = db.Column(db.Boolean())
+    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
     time = db.Column(db.DateTime, default=datetime.now)
-    # this connects this table to the reservation table, so i can see all of a user's reservations
     reservations = db.relationship('Reservation', backref='user')
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
     

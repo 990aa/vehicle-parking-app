@@ -1,75 +1,74 @@
 import os
-# bring in, flask and stuff
-from flask import Flask, redirect, url_for, session
-from extensions import db
-# for the secret key, dont want that on github
+from datetime import timedelta
+from flask import Flask, jsonify
+from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from dotenv import load_dotenv
-
-# make the app, standard stuff
-app = Flask(__name__)
-
-load_dotenv()  # load environment variables from .env file
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///parking.db'  # sqlite for dev, will break if i ever scale this
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # docs said to turn this off, so i did
-# gotta have a secret key for sessions, this is a good one i think
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-
-db.init_app(app)  # i always forget this line and then nothing works
-
-# bring in all my data models, need these to talk to the db
-from models.parking_lot import ParkingLot
-from models.parking_spot import ParkingSpot
-from models.user import User
-from models.reservation import Reservation
-from models.lot_bookings import LotBooking
-
-# and my controllers, where all the action happens
+from extensions import db
+from models.user import User, Role
 from controllers.user import user
 from controllers.admin import admin
 from controllers.authorisation import authorisation
 from controllers.check import check
+from security import user_datastore, security, jwt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
+load_dotenv()
 
-# tell flask about my controllers, so it knows what urls to listen for
-# i keep forgetting to register blueprints, then flask can't find my routes
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///parking.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback_secret_key')
+app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT', 'fallback_salt')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'fallback_jwt_secret')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+
+db.init_app(app)
+security.init_app(app, user_datastore)
+jwt.init_app(app)
 
 app.register_blueprint(user)
 app.register_blueprint(admin)
 app.register_blueprint(authorisation)
 app.register_blueprint(check)
 
-# this part runs when the app starts up
-with app.app_context():
-    # create the database tables if they dont exist
-    db.create_all()
-    # make sure there's always an admin user, so i can log in
-    # Create admin user if not exist
-    if not User.query.filter_by(username='admin').first():
-        
-        admin_user = User(username='admin', email='admin@vehiclepark.com', password='adm123', role='admin')
-        db.session.add(admin_user)
-        db.session.commit()
+@app.before_request
+def before_first_request():
+    if not hasattr(app, 'already_ran_before_first_request'):
+        with app.app_context():
+            db.create_all()
+            if not Role.query.filter_by(name='admin').first():
+                user_datastore.create_role(name='admin', description='Administrator')
+            if not Role.query.filter_by(name='user').first():
+                user_datastore.create_role(name='user', description='User')
+            if not User.query.filter_by(email='admin@test.com').first():
+                user_datastore.create_user(email='admin@test.com', password='password', roles=['admin'])
+            db.session.commit()
+        app.already_ran_before_first_request = True
 
-# this is the first page everyone sees
 @app.route('/')
-
 def index():
-    # if you're logged in, go to your dashboard
-    # If user is logged in, send them to the right dashboard, otherwise login
-    if 'user_id' in session:
-        # admins go to the admin page
-        if session.get('role') == 'admin':
-            return redirect(url_for('admin.admin_dashboard'))
-        # regular users go to their page
-        else:
-            return redirect(url_for('user.user_dashboard'))
-    # if you're not logged in, you gotta log in
-    return redirect(url_for('authorisation.login'))
+    if current_user.is_authenticated:
+        if current_user.has_role('admin'):
+            return jsonify({"message": "Welcome admin"})
+        return jsonify({"message": "Welcome user"})
+    return jsonify({"message": "Welcome guest"})
 
-# if i run this file directly, start the server
+@app.route('/api/token', methods=['POST'])
+def create_token():
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+    user = user_datastore.find_user(email=email)
+    if user and user.password == password:
+        access_token = create_access_token(identity=user.id)
+        return jsonify(access_token=access_token)
+    return jsonify({"msg": "Bad email or password"}), 401
+
+@app.route('/api/user', methods=['GET'])
+@jwt_required()
+def get_user():
+    current_user_id = get_jwt_identity()
+    user = user_datastore.find_user(id=current_user_id)
+    return jsonify(logged_in_as=user.email), 200
+
 if __name__ == '__main__':
-    # turn on debug mode, so i can see errors
-    # debug true for now, but don't forget to turn off in prod, 
     app.run(debug=True)
-# should i add error handlers? probably
-# also, sometimes sqlite locks up if i ctrl+c too fast, not sure why, maybe a windows thing

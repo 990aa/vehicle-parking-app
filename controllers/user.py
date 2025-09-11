@@ -1,6 +1,6 @@
 # all the things i need for this file to work
 from flask import Blueprint, redirect, url_for, flash, request, render_template
-from flask import session
+from flask_security import auth_required, current_user
 # my database helper
 from extensions import db
 
@@ -22,14 +22,12 @@ import plotly.io as pltio
 
 # this is the main user page, the dashboard
 @user.route('/user/dashboard')
+@auth_required('token')
 def user_dashboard():
-    # if you're not a user, you can't be here
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
     #import plotly.graph_objs as plt
     #import plotly.io as pltio
     # get the user's id from the session
-    user_id = session['user_id']
+    user_id = current_user.id
     now = datetime.now()
     # get all the reservations for this user
     all_reservations = Reservation.query.filter_by(user_id=user_id).order_by(Reservation.parking_time.asc()).all()
@@ -199,10 +197,8 @@ def user_dashboard():
 
 # this page is for booking a new spot
 @user.route('/user/booking')
+@auth_required('token')
 def user_booking():
-    # only users can book spots
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
     # get ready to show the parking lots
     from datetime import date
     lots = []
@@ -267,13 +263,10 @@ def user_booking():
 
 # this is for when a user clicks the "book" button
 @user.route('/user/book_spot/<int:lot_id>', methods=['POST'])
+@auth_required('token')
 def book_spot(lot_id):
-    # only users can book spots
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
-
     # get the user's id and the date they want to book
-    user_id = session['user_id']
+    user_id = current_user.id
     date_str = request.form.get('date')
     if not date_str:
         flash("Date is required.", 'error')
@@ -341,12 +334,10 @@ def book_spot(lot_id):
 
 # this is for when a user arrives at the parking lot and marks their car as parked
 @user.route('/user/mark_parked/<int:reservation_id>', methods=['GET', 'POST'])
+@auth_required('token')
 def mark_parked(reservation_id):
-    # only users can do this
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
     # find the reservation
-    reservation = Reservation.query.filter_by(id=reservation_id, user_id=session['user_id']).first()
+    reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
     now = datetime.now()
     # make sure the reservation is upcoming or active
     if reservation and reservation.status in ['U', 'A']:
@@ -375,12 +366,10 @@ def mark_parked(reservation_id):
 
 # this is for when a user leaves the parking lot and releases their spot
 @user.route('/user/release_spot/<int:reservation_id>', methods = ['GET', 'POST'])
+@auth_required('token')
 def release_spot(reservation_id):
-    # only users can do this
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
     # find the reservation
-    reservation = Reservation.query.filter_by(id=reservation_id, user_id=session['user_id']).first()
+    reservation = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
     # make sure the car is actually parked
     # only release if status is A and already parked, otherwise weird stuff happens
     if reservation.status == 'A' and reservation.parking_time:
@@ -427,12 +416,10 @@ def release_spot(reservation_id):
 
 # this is for when a user cancels a reservation
 @user.route('/user/cancel_reservation/<int:reservation_id>', methods=['POST'])
+@auth_required('token')
 def cancel_reservation(reservation_id):
-    # only users can do this
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
     # find the reservation
-    res = Reservation.query.filter_by(id=reservation_id, user_id=session['user_id']).first()
+    res = Reservation.query.filter_by(id=reservation_id, user_id=current_user.id).first()
     # make sure the reservation is upcoming or active
     if res.status in ['U', 'A']:
         try:
@@ -462,12 +449,10 @@ def cancel_reservation(reservation_id):
 
 # this page shows the user's parking history
 @user.route('/user/history')
+@auth_required('token')
 def user_history():
-    # only users can see this
-    if 'user_id' not in session or session.get('role') != 'user':
-        return redirect(url_for('authorisation.login'))
     # get the user's id
-    user_id = session['user_id']
+    user_id = current_user.id
     # i think this order_by is right, but sometimes Reservation.time is None, not sure why
     # for the search bar and filters
     # Filtering logic
