@@ -578,13 +578,6 @@ def payment(reservation_id):
     return render_template('payment_portal.html', reservation=reservation, lot_name=lot_name, spot_no=spot_no, amount_due=amount_due)
 
 
-# Export as CSV endpoint (user-triggered async job)
-@user.route('/user/export_csv', methods=['POST'])
-@auth_required('token')
-def export_csv():
-    export_user_parking_csv.delay(current_user.id, current_user.email)
-    flash('Your export is being processed. You will receive an email when it is ready.', 'info')
-    return redirect(url_for('user.user_dashboard'))
 
 @user.route('/user/export_csv', methods=['POST'])
 @auth_required('token')

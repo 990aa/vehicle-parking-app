@@ -7,8 +7,14 @@ from extensions import db
 
 authorisation = Blueprint('authorisation', __name__)
 
-@authorisation.route('/login', methods=['POST'])
+
+# Login route: render login.html on GET, handle login on POST
+@authorisation.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    # POST request
     if request.is_json:
         email = request.json.get('email', None)
         password = request.json.get('password', None)
@@ -20,12 +26,24 @@ def login():
 
     if user and user.password == password:
         access_token = create_access_token(identity=user.id)
+        
+        if not request.is_json:
+            return redirect(url_for('user.user_dashboard'))
         return jsonify(access_token=access_token)
     
+    if not request.is_json:
+        flash('Bad email or password', 'danger')
+        return render_template('login.html')
     return jsonify({"msg": "Bad email or password"}), 401
 
-@authorisation.route('/register', methods=['POST'])
+
+# Register route: render register.html on GET, handle registration on POST
+@authorisation.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+
+    # POST request
     if request.is_json:
         email = request.json.get('email', None)
         password = request.json.get('password', None)
@@ -34,10 +52,16 @@ def register():
         password = request.form.get('password', None)
 
     if user_datastore.find_user(email=email):
+        if not request.is_json:
+            flash('Email already exists', 'danger')
+            return render_template('register.html')
         return jsonify({"msg": "Email already exists"}), 400
 
     user_datastore.create_user(email=email, password=password, roles=['user'])
     db.session.commit()
+    if not request.is_json:
+        flash('User created successfully. Please log in.', 'success')
+        return redirect(url_for('authorisation.login'))
     return jsonify({"msg": "User created successfully"}), 201
 
 @authorisation.route('/logout')

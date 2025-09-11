@@ -1,5 +1,6 @@
 import csv
 import io
+from extensions import celery
 @celery.task(name='jobs.export_user_parking_csv')
 def export_user_parking_csv(user_id, user_email):
     """

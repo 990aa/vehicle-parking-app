@@ -1,6 +1,6 @@
 import os
 from datetime import timedelta
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect, url_for
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from dotenv import load_dotenv
 from extensions import db, cache, mail, celery
@@ -113,10 +113,15 @@ def create_app():
     api.add_namespace(user_ns, path='/api/user')
     api.add_namespace(admin_ns, path='/api/admin')
 
+
     app.register_blueprint(user)
     app.register_blueprint(admin)
     app.register_blueprint(authorisation)
     app.register_blueprint(check)
+
+    @app.route('/')
+    def index():
+        return redirect(url_for('authorisation.login'))
 
     @app.before_request
     def before_first_request():
@@ -128,16 +133,9 @@ def create_app():
                 if not Role.query.filter_by(name='user').first():
                     user_datastore.create_role(name='user', description='User')
                 if not User.query.filter_by(email='admin@test.com').first():
-                    user_datastore.create_user(email='admin@test.com', password='password', roles=['admin'])
+                    user_datastore.create_user(username='admin', email='admin@test.com', password='admin', roles=['admin'])
                 db.session.commit()
             app.already_ran_before_first_request = True
-
-
-    # Optionally, you can add a root endpoint for health check or landing
-    @app.route('/')
-    def index():
-        return jsonify({"message": "Vehicle Parking App API"})
-
     return app
 
 if __name__ == '__main__':
