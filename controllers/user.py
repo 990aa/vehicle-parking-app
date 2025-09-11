@@ -2,7 +2,7 @@
 from flask import Blueprint, redirect, url_for, flash, request, render_template
 from flask_security import auth_required, current_user
 # my database helper
-from extensions import db
+from extensions import db, cache
 
 # this is the user controller, for all the user pages
 user = Blueprint('user', __name__)
@@ -198,6 +198,7 @@ def user_dashboard():
 # this page is for booking a new spot
 @user.route('/user/booking')
 @auth_required('token')
+@cache.cached(timeout=50)
 def user_booking():
     # get ready to show the parking lots
     from datetime import date
@@ -480,7 +481,7 @@ def user_history():
             checkout_time = r.leaving_time.strftime('%H:%M')
         else:
             checkout_time = '-'
-        vehicle_number = r.vehicle_number if hasattr(r, 'vehicle_number') else '-'
+        vehicle_number = r.vehicle_number if hasattr(r, 'vehicle_number') else "-"
         # only show the times if the car is parked or has left
         # Only show times for active/completed
         if r.status in ['A', 'C']:

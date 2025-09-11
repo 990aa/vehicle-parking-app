@@ -6,7 +6,7 @@ from flask_security import auth_required, roles_required
 import plotly.graph_objs as plt
 import plotly.io as pltio
 # my database helper
-from extensions import db
+from extensions import db, cache
 # all the data models i need to talk to
 from models.user import User
 from models.parking_lot import ParkingLot
@@ -171,6 +171,7 @@ def admin_dashboard():
 @admin.route('/admin/users')
 @auth_required('token')
 @roles_required('admin')
+@cache.cached(timeout=50)
 def admin_users():
     # this is for the search bar, so i can find users
     query = request.args.get('q', '').strip().lower()
@@ -304,6 +305,7 @@ def create_lot():
 @admin.route('/admin/lots')
 @auth_required('token')
 @roles_required('admin')
+@cache.cached(timeout=50)
 def lots():
     # for the search bar
     query = request.args.get('q', '').strip().lower()
