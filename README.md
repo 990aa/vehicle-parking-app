@@ -166,14 +166,6 @@ This project uses `pytest`. Run all tests using `uv`:
 uv run pytest
 ```
 
-##  Linting & Formatting
-
-Ensure code quality using `ruff`:
-
-```bash
-uvx ruff check --fix && ruff format
-```
-
 ##  API Documentation
 
 
