@@ -2,16 +2,17 @@
 from extensions import db
 # for time stuff
 
+
 # this is the data model for a reservation
-class Reservation(db.Model):
+class Reservation(db.Model):  # type: ignore
     # the unique id for each reservation, don't touch it
     # id is just the pk, nothing special, don't touch
     id = db.Column(db.Integer, primary_key=True)
     # which spot this reservation is for
     # spot_id links to parking_spot, but i always forget which table name to use, flask figures it out
-    spot_id = db.Column(db.Integer, db.ForeignKey('parking_spot.id'), nullable=False)
+    spot_id = db.Column(db.Integer, db.ForeignKey("parking_spot.id"), nullable=False)
     # which user made this reservation
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     # when the user wants to park
     # parking_time is the requested booking start datetime (user-selected)
     parking_time = db.Column(db.DateTime, nullable=False)
@@ -27,6 +28,5 @@ class Reservation(db.Model):
     vehicle_number = db.Column(db.String(20), nullable=False)
     # the status of the reservation
     # status: U = upcoming, A = active, C = completed, X = cancelled
-    status = db.Column(db.String(1), default='U', nullable=False)
+    status = db.Column(db.String(1), default="U", nullable=False)
     # removed  'time' field;  parking_time for booking slot
-    

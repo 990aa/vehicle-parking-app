@@ -81,12 +81,68 @@ The application is built using a modern, scalable architecture splitting respons
     ```bash
     celery -A celery_worker.celery worker --loglevel=info
     ```
-3.  **Start Flask App:**
+3.  **Start Application Server:**
+    
+    You can run the application using **Uvicorn** (ASGI) managed by **Gunicorn** (Process Manager).
+    
+    *   **Development (Uvicorn directly with hot reload):**
+        ```bash
+        uv run python asgi.py
+        # OR
+        uv run uvicorn asgi:asgi_app --reload --port 5000
+        ```
+    
+    *   **Production (Linux/Mac - Gunicorn + Uvicorn Workers):**
+        ```bash
+        uv run gunicorn -c gunicorn_config.py asgi:asgi_app
+        ```
+
+    *   **Production (Windows - Uvicorn):**
+        ```bash
+        uv run uvicorn asgi:asgi_app --port 5000 --workers 4
+        ```
+
+4.  **Frontend Setup:**
+    Open a new terminal, navigate to `frontend/`, and start the Vue development server:
     ```bash
-    flask run
-    # OR
-    python app.py
+    cd frontend
+    npm install
+    npm run serve
     ```
+    Access the application at `http://localhost:8080`.
+
+##  Quickstart
+
+To get the full stack up and running immediately:
+
+1.  **Backend:**
+    ```bash
+    uv sync
+    # Make sure Redis is running
+    
+    # Windows:
+    uv run uvicorn asgi:asgi_app --port 5000
+    
+    # Linux/Mac:
+    # uv run gunicorn -c gunicorn_config.py asgi:asgi_app
+    ```
+
+2.  **Worker:**
+    ```bash
+    uv run celery -A celery_worker.celery worker --loglevel=info
+    ```
+
+3.  **Frontend:**
+    ```bash
+    cd frontend
+    npm install
+    npm run serve
+    ```
+
+4.  **Browser:**
+    *   **App URL:** [http://localhost:8080](http://localhost:8080)
+    *   **API Docs:** [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
+    *   **Login:** Register a new user or use credentials if seeded.
 
 ##  Running Tests
 
@@ -96,7 +152,16 @@ This project uses `pytest`. Run all tests using `uv`:
 uv run pytest
 ```
 
+##  Linting & Formatting
+
+Ensure code quality using `ruff`:
+
+```bash
+uvx ruff check --fix && ruff format
+```
+
 ##  API Documentation
+
 
 Once the application is running, access the interactive API docs at:
 `http://localhost:5000/api/docs` (or similar path depending on config).

@@ -3,6 +3,6 @@ from extensions import celery
 
 app = create_app()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with app.app_context():
-        celery.worker_main(['worker', '--loglevel=info'])
+        celery.worker_main(["worker", "--loglevel=info"])
