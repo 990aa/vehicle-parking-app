@@ -10,8 +10,9 @@ The application is built using a modern, scalable architecture splitting respons
 -   **Database:** SQLAlchemy (ORM) with SQLite (Dev) / PostgreSQL (Prod ready)
 -   **Task Queue:** Celery + Redis
 -   **Caching:** Redis
--   **Frontend:** Vue.js + Jinja2 Templates
+-   **Frontend:** Vue.js
 -   **API:** RESTful API with Swagger Documentation (Flask-RESTX)
+-   **Containerization:** Docker & Docker Compose
 
 ##  Key Features & Advanced Concepts
 
@@ -42,7 +43,20 @@ The application is built using a modern, scalable architecture splitting respons
 -   **Dependency Management:** standard `requirements.txt` and `pyproject.toml`.
 -   **Unit Testing:** Comprehensive test suite included.
 
-##  Getting Started
+##  Docker Support
+
+The easiest way to run the entire stack (Backend + Frontend + Worker + Redis) is using Docker Compose.
+
+1.  **Build and Run:**
+    ```bash
+    docker-compose up --build
+    ```
+
+2.  **Access:**
+    -   Frontend: [http://localhost:8080](http://localhost:8080)
+    -   Backend API: [http://localhost:5000](http://localhost:5000)
+
+##  Getting Started (Manual)
 
 ### Prerequisites
 -   Python 3.12+

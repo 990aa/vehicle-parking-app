@@ -1,50 +1,38 @@
 
 <template>
   <div id="app">
-    <router-view></router-view>
-  </div>
-</template>
-
-<script>
-export default {
-  name: 'App',
-}
-</script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  color: #2c3e50;
-  min-height: 100vh;
-}
-</style>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <router-link class="navbar-brand" to="/">Parking App</router-link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="#">Profile</a>
+              <router-link class="nav-link" to="/">Home</router-link>
+            </li>
+            <li class="nav-item" v-if="!user">
+              <router-link class="nav-link" to="/login">Login</router-link>
+            </li>
+            <li class="nav-item" v-if="!user">
+              <router-link class="nav-link" to="/register">Register</router-link>
+            </li>
+            <li class="nav-item" v-if="user">
+               <a class="nav-link" href="#" @click.prevent="logout">Logout</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
+
     <main class="container py-4">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6 text-center">
-          <img alt="Parking App Logo" src="./assets/logo.png" class="img-fluid mb-3" style="max-width:120px;">
-          <h1 class="mb-3">Welcome to Vehicle Parking App</h1>
-          <p class="lead">Unified, responsive parking management for all your needs. Works seamlessly on mobile and desktop.</p>
-          <button class="btn btn-success mt-3" @click="addToDesktop" v-if="deferredPrompt">Add to Desktop</button>
-          <div class="mt-4">
-            <button class="btn btn-primary" @click="fetchUser">Test API: Get User Info</button>
-            <div v-if="user" class="alert alert-info mt-3">
-              <strong>User API Response:</strong>
-              <pre class="text-start">{{ user }}</pre>
-            </div>
-            <div v-if="apiError" class="alert alert-danger mt-3">
-              <strong>API Error:</strong> {{ apiError }}
-            </div>
-          </div>
-        </div>
-      </div>
+      <router-view></router-view>
     </main>
+    
+    <div class="container text-center mt-5" v-if="deferredPrompt">
+        <button class="btn btn-outline-primary btn-sm" @click="addToDesktop">Add App to Home Screen</button>
+    </div>
   </div>
 </template>
 
@@ -56,8 +44,7 @@ export default {
   data() {
     return {
       deferredPrompt: null,
-      user: null,
-      apiError: null
+      user: null
     }
   },
   mounted() {
@@ -65,6 +52,7 @@ export default {
       e.preventDefault();
       this.deferredPrompt = e;
     });
+    this.checkUser();
   },
   methods: {
     addToDesktop() {
@@ -75,14 +63,17 @@ export default {
         });
       }
     },
-    async fetchUser() {
-      this.apiError = null;
+    async checkUser() {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        this.user = { loggedIn: true }; 
+      }
+    },
+    logout() {
+      localStorage.removeItem('access_token');
       this.user = null;
-      try {
-        const res = await api.get('/user/');
-        this.user = JSON.stringify(res.data, null, 2);
-      } catch (err) {
-        this.apiError = err.response?.data?.message || err.message;
+      if (this.$route.path !== '/') {
+        this.$router.push('/login');
       }
     }
   }
@@ -98,14 +89,6 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-}
-
-@media (max-width: 767px) {
-  h1 {
-    font-size: 2rem;
-  }
-  .container {
-    padding: 1rem !important;
-  }
+  min-height: 100vh;
 }
 </style>

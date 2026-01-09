@@ -31,6 +31,7 @@
 import api from '../services/api';
 
 export default {
+  name: 'UserRegister',
   data() {
     return {
       username: '',

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: parking-backend
+    restart: unless-stopped
+    environment:
+      - SECRET_KEY=dev_secret_key_change_in_prod
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - CACHE_REDIS_URL=redis://redis:6379/0
+      - DATABASE_URI=sqlite:////app/instance/parking_prod.db
+    volumes:
+      - ./instance:/app/instance
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+
+  worker:
+    build: .
+    container_name: parking-worker
+    restart: unless-stopped
+    command: celery -A celery_worker.celery worker --loglevel=info
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - DATABASE_URI=sqlite:////app/instance/parking_prod.db
+    volumes:
+      - ./instance:/app/instance
+    depends_on:
+      - backend
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: parking-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: parking-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+volumes:
+  instance:

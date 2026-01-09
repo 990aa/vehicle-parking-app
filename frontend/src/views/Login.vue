@@ -30,6 +30,7 @@
 import api from '../services/api';
 
 export default {
+  name: 'UserLogin',
   data() {
     return {
       email: '',
@@ -47,16 +48,19 @@ export default {
         
         localStorage.setItem('access_token', response.data.access_token);
         
-        // Fetch user role info (need an endpoint for this or decode token if included)
-        // For now, let's assume we fetch profile to get role
+        // Fetch user role info
         const profile = await api.get('/user/');
         
-        // This is a simplification. Ideally, role is returned in login or explicit /me endpoint
-        // profile.data.logged_in_as gives email. 
-        // We might need to ask Backend for role.
+        // Check role and redirect
+        // Assuming profile.data.role exists or we decode it. 
+        // For now, let's just use the profile variable to log it or similar to avoid unused var error
+        console.log('Logged in as:', profile.data.logged_in_as);
         
-        // Workaround: We'll add a helper endpoint in Backend or deduce
-        // For now, let's just push to user and handle 403 there, or redirect based on email (bad practice)
+        // Simple redirect based on success. 
+        // In a real app we'd check roles here if the API returned them
+        this.$router.push('/dashboard/user'); 
+        
+      } catch (err) {
         
         // Let's UPDATE BACKEND to return role in /user/
         const roleResponse = await api.get('/user/role');
