@@ -42,22 +42,6 @@ The application is built using a modern, scalable architecture splitting respons
 -   **Dependency Management:** standard `requirements.txt` and `pyproject.toml`.
 -   **Unit Testing:** Comprehensive test suite included.
 
-##  Project Structure
-
-```
-vehicle-parking-app/
-├── app.py                  # Application entry point & factory
-├── celery_worker.py        # Celery worker process entry
-├── extensions.py           # extensions initialization
-├── controllers/            # Route handlers (Blueprints)
-├── models/                 # Database models (SQLAlchemy)
-├── jobs.py                 # Background task definitions
-├── templates/              # Jinja2 HTML templates
-├── static/                 # CSS, JS, Images
-├── frontend/               # Vue.js frontend source
-└── tests/                  # Unit and Integration tests
-```
-
 ##  Getting Started
 
 ### Prerequisites
@@ -89,10 +73,7 @@ vehicle-parking-app/
     MAIL_USERNAME=your_email
     MAIL_PASSWORD=your_password
     ```
-
-4.  **Initialize Database:**
-    (The application likely auto-initializes or requires a flask command, e.g., `flask db upgrade` if migrations are used, or runs setup on start).
-
+    
 ### Running the Application
 
 1.  **Start Redis Server** (in a separate terminal)

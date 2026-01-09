@@ -1,7 +1,6 @@
 # my database helper
 from extensions import db
 # for time stuff
-from datetime import datetime
 
 # this is the data model for a reservation
 class Reservation(db.Model):

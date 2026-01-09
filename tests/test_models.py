@@ -20,9 +20,12 @@ def test_user_creation(db):
     assert retrieved_user.username == 'testuser'
 
 def test_user_role_assignment(db):
-    role = Role(name='admin', description='Administrator')
-    db.session.add(role)
-    db.session.commit()
+    # Role 'admin' is seeded in conftest, so fetch it
+    role = Role.query.filter_by(name='admin').first()
+    if not role:
+        role = Role(name='admin', description='Administrator')
+        db.session.add(role)
+        db.session.commit()
 
     user = User(
         username='adminuser',

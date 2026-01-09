@@ -1,7 +1,6 @@
 # my database helper
 from extensions import db
 # for date stuff
-from datetime import date
 
 # this table keeps track of how many spots are booked in a lot on a certain day
 class LotBooking(db.Model):

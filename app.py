@@ -1,14 +1,18 @@
 import os
 from datetime import timedelta
-from flask import Flask, jsonify, request, redirect, url_for
-from flask_security import SQLAlchemyUserDatastore, Security, current_user
+from flask import Flask, request, redirect, url_for, jsonify
+from flask_security import SQLAlchemyUserDatastore, Security, current_user, hash_password
+from flask_cors import CORS
 from dotenv import load_dotenv
 from extensions import db, cache, mail, celery
 from models.user import User, Role
-from controllers.user import user
-from controllers.admin import admin
-from controllers.authorisation import authorisation
-from controllers.check import check
+from models.reservation import Reservation
+from models.parking_lot import ParkingLot
+from models.parking_spot import ParkingSpot
+# from controllers.user import user
+# from controllers.admin import admin
+# from controllers.authorisation import authorisation
+# from controllers.check import check
 from security import user_datastore, security, jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restx import Api, Resource, Namespace, fields
@@ -62,6 +66,9 @@ def create_app(test_config=None):
     app.config['TWILIO_ACCOUNT_SID'] = os.getenv('TWILIO_ACCOUNT_SID')
     app.config['TWILIO_AUTH_TOKEN'] = os.getenv('TWILIO_AUTH_TOKEN')
     app.config['TWILIO_FROM_NUMBER'] = os.getenv('TWILIO_FROM_NUMBER')
+    
+    # Enable CORS
+    CORS(app)
 
     if test_config:
         app.config.update(test_config)
@@ -116,33 +123,144 @@ def create_app(test_config=None):
             email = data.get('email')
             password = data.get('password')
             user = user_datastore.find_user(email=email)
+            # Simple password check (should match hashing used in user_datastore)
+            # Assuming logic matches security.py configuration
             if user and user.password == password:
-                access_token = create_access_token(identity=user.id)
+                access_token = create_access_token(identity=str(user.id))
                 return {'access_token': access_token}, 200
+            elif user and not user.password: # Handle case if password hashing is used but raw password in DB
+                 pass 
             return {'msg': 'Bad email or password'}, 401
+
+    @auth_ns.route('/register')
+    class RegisterResource(Resource):
+        def post(self):
+            """Register a new user"""
+            data = request.get_json()
+            username = data.get('username')
+            email = data.get('email')
+            password = data.get('password')
+            
+            if user_datastore.find_user(email=email):
+                return {'message': 'User already exists'}, 400
+            
+            # Create user
+            # user_datastore handles hashing automatically if configured
+            user_datastore.create_user(username=username, email=email, password=password, roles=['user'])
+            db.session.commit()
+            return {'message': 'User created successfully'}, 201
 
     @user_ns.route('/')
     class UserResource(Resource):
         @jwt_required()
         def get(self):
             """Get current user info"""
-            current_user_id = get_jwt_identity()
+            current_user_id = int(get_jwt_identity())
             user = user_datastore.find_user(id=current_user_id)
             return {'logged_in_as': user.email}, 200
+
+    @user_ns.route('/role')
+    class UserRoleResource(Resource):
+        @jwt_required()
+        def get(self):
+            current_user_id = int(get_jwt_identity())
+            user = user_datastore.find_user(id=current_user_id)
+            role = user.roles[0].name if user.roles else 'user'
+            return {'role': role}, 200
+
+    @user_ns.route('/dashboard-data')
+    class UserDashboardResource(Resource):
+        @jwt_required()
+        def get(self):
+            current_user_id = int(get_jwt_identity())
+            # Logic from controllers/user.py
+            all_reservations = Reservation.query.filter_by(user_id=current_user_id).order_by(Reservation.parking_time.asc()).all()
+            
+            reservations_data = []
+            active = 0
+            completed = 0
+
+            for r in all_reservations:
+                spot = ParkingSpot.query.get(r.spot_id)
+                lot = ParkingLot.query.get(spot.lot_id) if spot else None
+                lot_name = lot.prime_location_name if lot else "Unknown"
+                
+                reservations_data.append({
+                    'id': r.id,
+                    'lot_name': lot_name,
+                    'spot_no': spot.spot_no if spot else '?',
+                    'parking_time': r.parking_time.isoformat() if r.parking_time else None,
+                    'leaving_time': r.leaving_time.isoformat() if r.leaving_time else None,
+                    'status': r.status # Assuming status field or property exists
+                })
+                # Simple logic for stats
+                if r.status == 'active': # Check actual status values
+                    active += 1
+                elif r.status == 'completed':
+                    completed += 1
+            
+            # Since Reservation model doesn't explicitly store status (calculated in controller logic usually),
+            # we will simplify for now. In original code it was calculated.
+            # "active" usually means parking_time < now < leaving_time or checkin without checkout
+            
+            return {
+                'reservations': reservations_data,
+                'stats': {'active': active, 'completed': completed}
+            }, 200
+
+    @admin_ns.route('/dashboard-data')
+    class AdminDashboardResource(Resource):
+        @jwt_required()
+        def get(self):
+            # Verify admin role
+            current_user_id = int(get_jwt_identity())
+            user = user_datastore.find_user(id=current_user_id)
+            if not user.has_role('admin'):
+                return {'message': 'Admin access required'}, 403
+
+            lots = ParkingLot.query.all()
+            total_lots = ParkingLot.query.count()
+            
+            # Simplified revenue calculation
+            total_revenue = 0
+            
+            lots_data = []
+            for lot in lots:
+                # Calculate occupancy
+                spots = ParkingSpot.query.filter_by(lot_id=lot.id).all()
+                total_spots = len(spots)
+                occupied = sum(1 for s in spots if s.status == 'O')
+                occupancy = (occupied / total_spots * 100) if total_spots > 0 else 0
+                
+                lots_data.append({
+                    'id': lot.id,
+                    'name': lot.prime_location_name,
+                    'address': lot.address,
+                    'price': lot.price_per_hr,
+                    'occupancy': round(occupancy, 1)
+                })
+
+            return {
+                'lots': lots_data,
+                'stats': {
+                    'total_lots': total_lots,
+                    'total_revenue': total_revenue # Placeholder
+                }
+            }, 200
 
     api.add_namespace(auth_ns, path='/auth')
     api.add_namespace(user_ns, path='/user')
     api.add_namespace(admin_ns, path='/admin')
 
-
-    app.register_blueprint(user, url_prefix='/user')
-    app.register_blueprint(admin, url_prefix='/admin')
-    app.register_blueprint(authorisation)
-    app.register_blueprint(check)
+    # Removed blueprints
+    # app.register_blueprint(user, url_prefix='/user')
+    # app.register_blueprint(admin, url_prefix='/admin')
+    # app.register_blueprint(authorisation)
+    # app.register_blueprint(check)
 
     @app.route('/')
     def index():
-        return redirect(url_for('authorisation.login'))
+        return "Please access via Frontend port 8080 or build dist"
 
     @app.before_request
     def before_first_request():

@@ -10,8 +10,6 @@ def export_user_parking_csv(user_id, user_email):
     app = create_app()
     with app.app_context():
         from models.reservation import Reservation
-        from models.parking_spot import ParkingSpot
-        from models.parking_lot import ParkingLot
         user_reservations = Reservation.query.filter_by(user_id=user_id).order_by(Reservation.parking_time.asc()).all()
         output = io.StringIO()
         writer = csv.writer(output)
@@ -36,7 +34,6 @@ def export_user_parking_csv(user_id, user_email):
         msg.body = 'Attached is your parking spot usage export as requested.'
         msg.attach('parking_spots_export.csv', 'text/csv', csv_data)
         mail.send(msg)
-from flask import render_template_string
 # Celery task for monthly activity report
 @celery.task(name='jobs.send_monthly_activity_report')
 def send_monthly_activity_report():
@@ -45,7 +42,6 @@ def send_monthly_activity_report():
     """
     from app import create_app
     from reportlab.lib.pagesizes import letter
-    from reportlab.pdfgen import canvas
     from reportlab.lib import colors
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
     from reportlab.lib.styles import getSampleStyleSheet
@@ -54,8 +50,7 @@ def send_monthly_activity_report():
     with app.app_context():
         from models.user import User
         from models.reservation import Reservation
-        from models.parking_lot import ParkingLot
-        from sqlalchemy import extract, func
+        from sqlalchemy import extract
         import calendar
         now = datetime.now()
         year = now.year
