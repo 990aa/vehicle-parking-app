@@ -44,7 +44,8 @@ def test_parking_lot_creation(db):
         prime_location_name="Test Lot",
         price_per_hr=10.0,
         address="123 Test St",
-        pin_code="12345"
+        pin_code="12345",
+        max_spots=100
     )
     db.session.add(lot)
     db.session.commit()
@@ -57,7 +58,8 @@ def test_parking_spot_creation(db):
         prime_location_name="Spot Lot",
         price_per_hr=5.0,
         address="456 Spot Ave",
-        pin_code="67890"
+        pin_code="67890",
+        max_spots=50
     )
     db.session.add(lot)
     db.session.commit()

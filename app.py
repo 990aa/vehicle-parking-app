@@ -34,7 +34,6 @@ logging.root.setLevel(logging.INFO)
 load_dotenv()
 
 def create_app(test_config=None):
-    # ... (rest of the function)
 
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///parking.db'
@@ -88,7 +87,7 @@ def create_app(test_config=None):
     # Flask-RESTX API setup
     api = Api(app, version='1.0', title='Vehicle Parking API',
               description='API documentation for Vehicle Parking App',
-              doc='/api/docs')
+              doc='/docs', prefix='/api') # Moved docs to /api/docs and prefix to /api
 
     # Namespaces for API endpoints
     auth_ns = Namespace('auth', description='Authentication operations')
@@ -131,9 +130,9 @@ def create_app(test_config=None):
             user = user_datastore.find_user(id=current_user_id)
             return {'logged_in_as': user.email}, 200
 
-    api.add_namespace(auth_ns, path='/api/auth')
-    api.add_namespace(user_ns, path='/api/user')
-    api.add_namespace(admin_ns, path='/api/admin')
+    api.add_namespace(auth_ns, path='/auth')
+    api.add_namespace(user_ns, path='/user')
+    api.add_namespace(admin_ns, path='/admin')
 
 
     app.register_blueprint(user, url_prefix='/user')
