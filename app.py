@@ -33,7 +33,7 @@ logging.root.setLevel(logging.INFO)
 
 load_dotenv()
 
-def create_app():
+def create_app(test_config=None):
     # ... (rest of the function)
 
     app = Flask(__name__)
@@ -63,6 +63,9 @@ def create_app():
     app.config['TWILIO_ACCOUNT_SID'] = os.getenv('TWILIO_ACCOUNT_SID')
     app.config['TWILIO_AUTH_TOKEN'] = os.getenv('TWILIO_AUTH_TOKEN')
     app.config['TWILIO_FROM_NUMBER'] = os.getenv('TWILIO_FROM_NUMBER')
+
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
     security.init_app(app, user_datastore)
