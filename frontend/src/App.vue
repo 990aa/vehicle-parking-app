@@ -37,8 +37,6 @@
 </template>
 
 <script>
-import api from './api';
-
 export default {
   name: 'App',
   data() {

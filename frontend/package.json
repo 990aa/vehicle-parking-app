@@ -44,5 +44,10 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "overrides": {
+    "cross-spawn": "^7.0.6",
+    "postcss": "^8.5.1",
+    "webpack-dev-server": "^5.2.2"
+  }
 }

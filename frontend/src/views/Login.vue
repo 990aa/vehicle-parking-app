@@ -49,20 +49,6 @@ export default {
         localStorage.setItem('access_token', response.data.access_token);
         
         // Fetch user role info
-        const profile = await api.get('/user/');
-        
-        // Check role and redirect
-        // Assuming profile.data.role exists or we decode it. 
-        // For now, let's just use the profile variable to log it or similar to avoid unused var error
-        console.log('Logged in as:', profile.data.logged_in_as);
-        
-        // Simple redirect based on success. 
-        // In a real app we'd check roles here if the API returned them
-        this.$router.push('/dashboard/user'); 
-        
-      } catch (err) {
-        
-        // Let's UPDATE BACKEND to return role in /user/
         const roleResponse = await api.get('/user/role');
         const role = roleResponse.data.role;
         localStorage.setItem('user_role', role);
@@ -70,9 +56,8 @@ export default {
         if (role === 'admin') {
           this.$router.push('/admin/dashboard');
         } else {
-          this.$router.push('/user/dashboard');
+          this.$router.push('/user/dashboard'); // Fixed route from /dashboard/user to /user/dashboard based on earlier context
         }
-
       } catch (err) {
         this.error = 'Invalid email or password';
         console.error(err);
