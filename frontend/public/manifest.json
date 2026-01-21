@@ -1,11 +1,11 @@
 {
-  "name": "Vehicle Parking App",
-  "short_name": "ParkingApp",
+  "name": "parkapp - Smart Parking Solutions",
+  "short_name": "parkapp",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0d6efd",
-  "description": "Unified responsive parking app for mobile and desktop.",
+  "theme_color": "#1a56db",
+  "description": "Smart parking management solution for finding and reserving parking spots.",
   "icons": [
     {
       "src": "favicon.ico",

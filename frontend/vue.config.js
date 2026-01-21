@@ -1,12 +1,23 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
+  devServer: {
+    port: 8080,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+        logLevel: 'debug'
+      }
+    }
+  },
   pwa: {
-    name: 'Vehicle Parking App',
-    themeColor: '#0d6efd',
-    msTileColor: '#0d6efd',
+    name: 'parkapp - Smart Parking',
+    themeColor: '#1a56db',
+    msTileColor: '#1a56db',
     manifestOptions: {
-      short_name: 'ParkingApp',
+      short_name: 'parkapp',
       background_color: '#ffffff',
       display: 'standalone',
     },

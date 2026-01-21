@@ -232,7 +232,7 @@ def create_app(test_config=None):
                 logger.info(f"New user registered: {email}")
                 
                 return {
-                    "message": "Account created successfully! Welcome to ParkEase.",
+                    "message": "Account created successfully! Welcome to parkapp.",
                     "access_token": access_token,
                     "user": {
                         "id": user.id,
@@ -842,9 +842,9 @@ def create_app(test_config=None):
     def index():
         return """
         <html>
-        <head><title>ParkEase API</title></head>
+        <head><title>parkapp API</title></head>
         <body style="font-family: Arial; padding: 50px; text-align: center;">
-            <h1>🚗 ParkEase API Server</h1>
+            <h1>parkapp API Server</h1>
             <p>API is running. Access frontend at <a href="http://localhost:8080">http://localhost:8080</a></p>
             <p>API Documentation: <a href="/api/docs">/api/docs</a></p>
         </body>
@@ -870,14 +870,33 @@ def create_app(test_config=None):
         
         # Create default admin user
         if not User.query.filter_by(email="admin@parkease.com").first():
-            create_user_with_hash(
-                username="admin",
-                email="admin@parkease.com",
-                password="admin123",
-                roles=["admin"]
-            )
-            db.session.commit()
-            logger.info("Created default admin user: admin@parkease.com / admin123")
+            try:
+                create_user_with_hash(
+                    username="admin",
+                    email="admin@parkease.com",
+                    password="admin123",
+                    roles=["admin"]
+                )
+                db.session.commit()
+                logger.info("Created default admin user: admin@parkease.com / admin123")
+            except Exception as e:
+                db.session.rollback()
+                logger.warning(f"Could not create admin user: {e}")
+        
+        # Create default test user
+        if not User.query.filter_by(email="user@parkease.com").first():
+            try:
+                create_user_with_hash(
+                    username="testuser",
+                    email="user@parkease.com",
+                    password="user123",
+                    roles=["user"]
+                )
+                db.session.commit()
+                logger.info("Created default test user: user@parkease.com / user123")
+            except Exception as e:
+                db.session.rollback()
+                logger.warning(f"Could not create test user: {e}")
         
         # Create sample parking lots if none exist
         if ParkingLot.query.count() == 0:

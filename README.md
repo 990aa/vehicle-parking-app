@@ -1,8 +1,18 @@
-# Vehicle Parking Management System
+# parkapp - Smart Parking Management System
 
 A production-grade, full-stack vehicle parking management application designed to demonstrate advanced Python, Flask, and system architecture concepts. This application handles user management, parking spot reservations, automated reporting, and payment integration.
 
-##  System Overview
+## Default Credentials
+
+**Admin Account:**
+- Email: `admin@parkapp.com`
+- Password: `admin123`
+
+**Test User Account:**
+- Email: `user@parkapp.com`
+- Password: `user123`
+
+## System Overview
 
 The application is built using a modern, scalable architecture splitting responsibilities across different services and layers:
 
@@ -156,9 +166,10 @@ To get the full stack up and running immediately:
 4.  **Browser:**
     *   **App URL:** [http://localhost:8080](http://localhost:8080)
     *   **API Docs:** [http://localhost:5000/api/docs](http://localhost:5000/api/docs)
-    *   **Login:** Register a new user or use credentials if seeded.
+    *   **Admin Login:** `admin@parkapp.com` / `admin123`
+    *   **User Login:** `user@parkapp.com` / `user123`
 
-##  Running Tests
+## Running Tests
 
 This project uses `pytest`. Run all tests using `uv`:
 

@@ -10,27 +10,27 @@
           
           <div class="features-list">
             <div class="feature-item">
-              <span class="feature-icon">📍</span>
-              <span>Find parking spots instantly</span>
+              <span class="feature-icon">✨</span>
+              <span>Create your free account</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">💳</span>
-              <span>Easy online reservations</span>
+              <span class="feature-icon">🎯</span>
+              <span>Reserve spots in seconds</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">⏰</span>
-              <span>Save time, every day</span>
+              <span class="feature-icon">💰</span>
+              <span>Save money with smart pricing</span>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Right Side - Login Form -->
+      <!-- Right Side - Register Form -->
       <div class="auth-form-container">
         <div class="auth-form-wrapper">
           <div class="auth-header">
-            <h2>Welcome back</h2>
-            <p>Sign in to your account to continue</p>
+            <h2>Create Account</h2>
+            <p>Join thousands of users finding parking easily</p>
           </div>
           
           <!-- Global Error Message -->
@@ -45,7 +45,26 @@
             <span>{{ successMessage }}</span>
           </div>
           
-          <form @submit.prevent="handleLogin" class="auth-form">
+          <form @submit.prevent="handleRegister" class="auth-form">
+            <div class="form-group">
+              <label for="username" class="form-label">Username</label>
+              <div class="input-wrapper" :class="{ 'has-error': errors.username }">
+                <span class="input-icon">👤</span>
+                <input
+                  type="text"
+                  id="username"
+                  v-model="username"
+                  placeholder="Choose a username"
+                  class="form-input"
+                  :class="{ 'input-error': errors.username }"
+                  @focus="clearError('username')"
+                  autocomplete="username"
+                />
+              </div>
+              <span v-if="errors.username" class="error-message">{{ errors.username }}</span>
+              <span v-else class="hint-text">At least 3 characters</span>
+            </div>
+            
             <div class="form-group">
               <label for="email" class="form-label">Email Address</label>
               <div class="input-wrapper" :class="{ 'has-error': errors.email }">
@@ -54,7 +73,7 @@
                   type="email"
                   id="email"
                   v-model="email"
-                  placeholder="Enter your email"
+                  placeholder="you@example.com"
                   class="form-input"
                   :class="{ 'input-error': errors.email }"
                   @focus="clearError('email')"
@@ -65,20 +84,19 @@
             </div>
             
             <div class="form-group">
-              <div class="label-row">
-                <label for="password" class="form-label">Password</label>
-              </div>
+              <label for="password" class="form-label">Password</label>
               <div class="input-wrapper" :class="{ 'has-error': errors.password }">
                 <span class="input-icon">🔒</span>
                 <input
                   :type="showPassword ? 'text' : 'password'"
                   id="password"
                   v-model="password"
-                  placeholder="Enter your password"
+                  placeholder="Create a strong password"
                   class="form-input"
                   :class="{ 'input-error': errors.password }"
                   @focus="clearError('password')"
-                  autocomplete="current-password"
+                  @input="checkPasswordStrength"
+                  autocomplete="new-password"
                 />
                 <button 
                   type="button" 
@@ -89,6 +107,38 @@
                 </button>
               </div>
               <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
+              
+              <!-- Password Strength Indicator -->
+              <div v-if="password && !errors.password" class="password-strength">
+                <div class="strength-bar">
+                  <div 
+                    class="strength-fill" 
+                    :class="passwordStrength.class"
+                    :style="{ width: passwordStrength.width }"
+                  ></div>
+                </div>
+                <span class="strength-text" :class="passwordStrength.class">
+                  {{ passwordStrength.text }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">Confirm Password</label>
+              <div class="input-wrapper" :class="{ 'has-error': errors.confirmPassword }">
+                <span class="input-icon">🔐</span>
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  id="confirmPassword"
+                  v-model="confirmPassword"
+                  placeholder="Confirm your password"
+                  class="form-input"
+                  :class="{ 'input-error': errors.confirmPassword }"
+                  @focus="clearError('confirmPassword')"
+                  autocomplete="new-password"
+                />
+              </div>
+              <span v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</span>
             </div>
             
             <button 
@@ -97,37 +147,12 @@
               :disabled="isLoading"
             >
               <span v-if="isLoading" class="loading-spinner"></span>
-              <span v-else>Sign In</span>
+              <span v-else>Create Account</span>
             </button>
           </form>
           
-          <div class="auth-divider">
-            <span>or</span>
-          </div>
-          
-          <!-- Demo Credentials -->
-          <div class="demo-credentials">
-            <p class="demo-title">Demo Accounts</p>
-            <div class="demo-buttons">
-              <button 
-                type="button" 
-                class="btn btn-demo"
-                @click="fillAdminCredentials"
-              >
-                <span>👔</span> Admin Login
-              </button>
-              <button 
-                type="button" 
-                class="btn btn-demo"
-                @click="fillUserCredentials"
-              >
-                <span>👤</span> User Login
-              </button>
-            </div>
-          </div>
-          
           <div class="auth-footer">
-            <p>Don't have an account? <router-link to="/register">Create one</router-link></p>
+            <p>Already have an account? <router-link to="/login">Sign in</router-link></p>
           </div>
         </div>
       </div>
@@ -139,18 +164,27 @@
 import { authAPI } from '../services/api';
 
 export default {
-  name: 'LoginView',
+  name: 'RegisterView',
   data() {
     return {
+      username: '',
       email: '',
       password: '',
+      confirmPassword: '',
       showPassword: false,
       isLoading: false,
       globalError: '',
       successMessage: '',
       errors: {
+        username: '',
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
+      },
+      passwordStrength: {
+        class: '',
+        width: '0%',
+        text: ''
       }
     };
   },
@@ -160,40 +194,92 @@ export default {
       this.globalError = '';
     },
     
-    fillAdminCredentials() {
-      this.email = 'admin@parkapp.com';
-      this.password = 'admin123';
-      this.clearAllErrors();
-    },
-    
-    fillUserCredentials() {
-      this.email = 'user@example.com';
-      this.password = 'password123';
-      this.clearAllErrors();
-    },
-    
     clearAllErrors() {
-      this.errors = { email: '', password: '' };
+      this.errors = { username: '', email: '', password: '', confirmPassword: '' };
       this.globalError = '';
     },
     
-    async handleLogin() {
+    checkPasswordStrength() {
+      const password = this.password;
+      let strength = 0;
+      
+      if (password.length >= 6) strength++;
+      if (password.length >= 8) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+      
+      const levels = [
+        { class: 'weak', width: '20%', text: 'Weak' },
+        { class: 'weak', width: '40%', text: 'Fair' },
+        { class: 'medium', width: '60%', text: 'Good' },
+        { class: 'strong', width: '80%', text: 'Strong' },
+        { class: 'strong', width: '100%', text: 'Excellent' }
+      ];
+      
+      this.passwordStrength = levels[Math.min(strength, 4)];
+    },
+    
+    validateForm() {
+      let isValid = true;
       this.clearAllErrors();
       
-      // Client-side validation
-      if (!this.email) {
-        this.errors.email = 'Please enter your email address';
-        return;
+      // Username validation
+      if (!this.username.trim()) {
+        this.errors.username = 'Username is required';
+        isValid = false;
+      } else if (this.username.length < 3) {
+        this.errors.username = 'Username must be at least 3 characters';
+        isValid = false;
+      } else if (this.username.length > 50) {
+        this.errors.username = 'Username must be less than 50 characters';
+        isValid = false;
       }
+      
+      // Email validation
+      if (!this.email.trim()) {
+        this.errors.email = 'Email is required';
+        isValid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+        this.errors.email = 'Please enter a valid email address';
+        isValid = false;
+      }
+      
+      // Password validation
       if (!this.password) {
-        this.errors.password = 'Please enter your password';
+        this.errors.password = 'Password is required';
+        isValid = false;
+      } else if (this.password.length < 6) {
+        this.errors.password = 'Password must be at least 6 characters';
+        isValid = false;
+      }
+      
+      // Confirm password validation
+      if (!this.confirmPassword) {
+        this.errors.confirmPassword = 'Please confirm your password';
+        isValid = false;
+      } else if (this.password !== this.confirmPassword) {
+        this.errors.confirmPassword = 'Passwords do not match';
+        isValid = false;
+      }
+      
+      return isValid;
+    },
+    
+    async handleRegister() {
+      if (!this.validateForm()) {
         return;
       }
       
       this.isLoading = true;
       
       try {
-        const response = await authAPI.login(this.email, this.password);
+        const response = await authAPI.register(
+          this.username.trim(),
+          this.email.trim().toLowerCase(),
+          this.password
+        );
+        
         const { access_token, user, message } = response.data;
         
         // Store auth data
@@ -201,31 +287,25 @@ export default {
         localStorage.setItem('user_role', user.role);
         localStorage.setItem('user', JSON.stringify(user));
         
-        this.successMessage = message || 'Login successful!';
+        this.successMessage = message || 'Account created successfully!';
         
-        // Emit login success event
-        this.$emit('login-success', user);
-        
-        // Redirect based on role
+        // Redirect to dashboard
         setTimeout(() => {
-          if (user.role === 'admin') {
-            this.$router.push('/admin/dashboard');
-          } else {
-            this.$router.push('/user/dashboard');
-          }
-        }, 500);
+          this.$router.push('/user/dashboard');
+        }, 1000);
         
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('Registration error:', error);
         
         if (error.errors) {
+          if (error.errors.username) this.errors.username = error.errors.username;
           if (error.errors.email) this.errors.email = error.errors.email;
           if (error.errors.password) this.errors.password = error.errors.password;
           if (error.errors.general) this.globalError = error.errors.general;
         }
         
-        if (!this.errors.email && !this.errors.password && !this.globalError) {
-          this.globalError = error.message || 'Login failed. Please try again.';
+        if (!this.globalError && !Object.values(this.errors).some(e => e)) {
+          this.globalError = error.message || 'Registration failed. Please try again.';
         }
       } finally {
         this.isLoading = false;
@@ -339,6 +419,7 @@ export default {
   justify-content: center;
   padding: 48px;
   background: var(--bg-primary);
+  overflow-y: auto;
 }
 
 .auth-form-wrapper {
@@ -408,12 +489,6 @@ export default {
   color: var(--text-primary);
 }
 
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .input-wrapper {
   position: relative;
   display: flex;
@@ -468,6 +543,58 @@ export default {
   margin-top: 4px;
 }
 
+.hint-text {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Password Strength */
+.password-strength {
+  margin-top: 8px;
+}
+
+.strength-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.strength-fill {
+  height: 100%;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-fill.weak {
+  background: var(--danger);
+}
+
+.strength-fill.medium {
+  background: var(--warning);
+}
+
+.strength-fill.strong {
+  background: var(--success);
+}
+
+.strength-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.strength-text.weak {
+  color: var(--danger);
+}
+
+.strength-text.medium {
+  color: var(--warning);
+}
+
+.strength-text.strong {
+  color: var(--success);
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
@@ -516,58 +643,6 @@ export default {
   to { transform: rotate(360deg); }
 }
 
-/* Divider */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  margin: 24px 0;
-  color: var(--text-light);
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border-color);
-}
-
-.auth-divider span {
-  padding: 0 16px;
-  font-size: 0.9rem;
-}
-
-/* Demo Credentials */
-.demo-credentials {
-  text-align: center;
-}
-
-.demo-title {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.demo-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-demo {
-  flex: 1;
-  padding: 12px 16px;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  border: 1px solid var(--border-color);
-}
-
-.btn-demo:hover {
-  background: var(--bg-secondary);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
 /* Footer */
 .auth-footer {
   text-align: center;
@@ -593,12 +668,6 @@ export default {
   
   .auth-form-container {
     padding: 24px;
-  }
-}
-
-@media (max-width: 480px) {
-  .demo-buttons {
-    flex-direction: column;
   }
 }
 </style>

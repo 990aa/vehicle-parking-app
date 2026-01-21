@@ -5,7 +5,7 @@
       <div class="navbar-container">
         <router-link to="/" class="navbar-brand">
           <span class="brand-icon">🚗</span>
-          <span class="brand-text">ParkEase</span>
+          <span class="brand-text">parkapp</span>
         </router-link>
         
         <button class="navbar-toggle" @click="mobileMenuOpen = !mobileMenuOpen" v-if="isLoggedIn">
