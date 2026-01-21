@@ -28,6 +28,6 @@ class User(db.Model, UserMixin):  # type: ignore
     notification_contact = db.Column(db.String(100))
     last_notified = db.Column(db.DateTime)
     reservations = db.relationship("Reservation", backref="user")
-    roles = db.relationship(
+    roles = db.relationship(  # type: ignore[assignment]
         "Role", secondary=roles_users, backref=db.backref("users", lazy="dynamic")
     )

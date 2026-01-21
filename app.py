@@ -2,7 +2,7 @@ import os
 import uuid
 from datetime import timedelta, datetime
 from functools import wraps
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,14 +12,12 @@ from models.user import User, Role
 from models.reservation import Reservation
 from models.parking_lot import ParkingLot
 from models.parking_spot import ParkingSpot
-from models.lot_bookings import LotBooking
 
 from security import user_datastore, security, jwt
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity,
-    get_jwt,
 )
 from flask_restx import Api, Resource, Namespace, fields
 
@@ -399,8 +397,6 @@ def create_app(test_config=None):
 
                 reservations_data = []
                 stats = {"active": 0, "completed": 0, "upcoming": 0, "cancelled": 0}
-                
-                now = datetime.now()
 
                 for r in reservations:
                     spot = ParkingSpot.query.get(r.spot_id)
@@ -782,13 +778,13 @@ def create_app(test_config=None):
             
             lots = ParkingLot.query.all()
             return {"lots": [{
-                "id": l.id,
-                "name": l.prime_location_name,
-                "address": l.address,
-                "pin_code": l.pin_code,
-                "price_per_hr": l.price_per_hr,
-                "max_spots": l.max_spots
-            } for l in lots]}, 200
+                "id": lot.id,
+                "name": lot.prime_location_name,
+                "address": lot.address,
+                "pin_code": lot.pin_code,
+                "price_per_hr": lot.price_per_hr,
+                "max_spots": lot.max_spots
+            } for lot in lots]}, 200
         
         @jwt_required()
         @admin_ns.expect(lot_model)
@@ -869,31 +865,31 @@ def create_app(test_config=None):
         db.session.commit()
         
         # Create default admin user
-        if not User.query.filter_by(email="admin@parkease.com").first():
+        if not User.query.filter_by(email="admin@parkapp.com").first():
             try:
                 create_user_with_hash(
                     username="admin",
-                    email="admin@parkease.com",
+                    email="admin@parkapp.com",
                     password="admin123",
                     roles=["admin"]
                 )
                 db.session.commit()
-                logger.info("Created default admin user: admin@parkease.com / admin123")
+                logger.info("Created default admin user: admin@parkapp.com / admin123")
             except Exception as e:
                 db.session.rollback()
                 logger.warning(f"Could not create admin user: {e}")
         
         # Create default test user
-        if not User.query.filter_by(email="user@parkease.com").first():
+        if not User.query.filter_by(email="user@parkapp.com").first():
             try:
                 create_user_with_hash(
                     username="testuser",
-                    email="user@parkease.com",
+                    email="user@parkapp.com",
                     password="user123",
                     roles=["user"]
                 )
                 db.session.commit()
-                logger.info("Created default test user: user@parkease.com / user123")
+                logger.info("Created default test user: user@parkapp.com / user123")
             except Exception as e:
                 db.session.rollback()
                 logger.warning(f"Could not create test user: {e}")

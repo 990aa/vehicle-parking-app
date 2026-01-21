@@ -4,11 +4,11 @@
       <!-- Page Header -->
       <div class="page-header">
         <div class="header-content">
-          <h1>Welcome back, {{ userName }}! 👋</h1>
+          <h1>Welcome back, {{ userName }}</h1>
           <p>Manage your parking reservations and find new spots</p>
         </div>
         <router-link to="/parking" class="btn btn-primary">
-          <span>🅿️</span> Find Parking
+          Find Parking
         </router-link>
       </div>
 
@@ -20,7 +20,7 @@
 
       <!-- Error State -->
       <div v-else-if="error" class="error-container">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon">!</div>
         <h3>Failed to load dashboard</h3>
         <p>{{ error }}</p>
         <button @click="loadDashboard" class="btn btn-primary">Try Again</button>
@@ -31,7 +31,7 @@
         <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-icon stat-icon-upcoming">📅</div>
+            <div class="stat-icon stat-icon-upcoming">U</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.upcoming }}</span>
               <span class="stat-label">Upcoming</span>
@@ -39,7 +39,7 @@
           </div>
           
           <div class="stat-card">
-            <div class="stat-icon stat-icon-active">🚗</div>
+            <div class="stat-icon stat-icon-active">A</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.active }}</span>
               <span class="stat-label">Active</span>
@@ -47,7 +47,7 @@
           </div>
           
           <div class="stat-card">
-            <div class="stat-icon stat-icon-completed">✅</div>
+            <div class="stat-icon stat-icon-completed">C</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.completed }}</span>
               <span class="stat-label">Completed</span>
@@ -55,7 +55,7 @@
           </div>
           
           <div class="stat-card">
-            <div class="stat-icon stat-icon-cancelled">❌</div>
+            <div class="stat-icon stat-icon-cancelled">X</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.cancelled }}</span>
               <span class="stat-label">Cancelled</span>
@@ -81,7 +81,7 @@
 
           <!-- Empty State -->
           <div v-if="filteredReservations.length === 0" class="empty-state">
-            <div class="empty-icon">🚗</div>
+            <div class="empty-icon">P</div>
             <h3>No {{ activeFilter === 'all' ? '' : activeFilter }} reservations</h3>
             <p>Book a parking spot to get started</p>
             <router-link to="/parking" class="btn btn-primary">Find Parking</router-link>
@@ -107,19 +107,19 @@
                 
                 <div class="reservation-details">
                   <div class="detail-item">
-                    <span class="detail-icon">🅿️</span>
+                    <span class="detail-icon">P</span>
                     <span>Spot {{ reservation.spot_no }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-icon">🚙</span>
+                    <span class="detail-icon">V</span>
                     <span>{{ reservation.vehicle_number }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-icon">📅</span>
+                    <span class="detail-icon">D</span>
                     <span>{{ formatDate(reservation.parking_time) }}</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-icon">⏰</span>
+                    <span class="detail-icon">T</span>
                     <span>{{ formatTime(reservation.parking_time) }} - {{ formatTime(reservation.leaving_time) }}</span>
                   </div>
                 </div>

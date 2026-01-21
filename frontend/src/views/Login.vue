@@ -4,21 +4,21 @@
       <!-- Left Side - Branding -->
       <div class="auth-branding">
         <div class="branding-content">
-          <div class="brand-logo">🚗</div>
-          <h1 class="brand-title">parkapp</h1>
+          <div class="brand-logo">P</div>
+          <h1 class="brand-title">ParkApp</h1>
           <p class="brand-tagline">Smart Parking Solutions</p>
           
           <div class="features-list">
             <div class="feature-item">
-              <span class="feature-icon">📍</span>
+              <span class="feature-icon">*</span>
               <span>Find parking spots instantly</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">💳</span>
+              <span class="feature-icon">*</span>
               <span>Easy online reservations</span>
             </div>
             <div class="feature-item">
-              <span class="feature-icon">⏰</span>
+              <span class="feature-icon">*</span>
               <span>Save time, every day</span>
             </div>
           </div>
@@ -35,13 +35,13 @@
           
           <!-- Global Error Message -->
           <div v-if="globalError" class="alert alert-error">
-            <span class="alert-icon">⚠️</span>
+            <span class="alert-icon">!</span>
             <span>{{ globalError }}</span>
           </div>
           
           <!-- Success Message -->
           <div v-if="successMessage" class="alert alert-success">
-            <span class="alert-icon">✓</span>
+            <span class="alert-icon">OK</span>
             <span>{{ successMessage }}</span>
           </div>
           
@@ -49,7 +49,7 @@
             <div class="form-group">
               <label for="email" class="form-label">Email Address</label>
               <div class="input-wrapper" :class="{ 'has-error': errors.email }">
-                <span class="input-icon">✉️</span>
+                <span class="input-icon">@</span>
                 <input
                   type="email"
                   id="email"
@@ -69,7 +69,7 @@
                 <label for="password" class="form-label">Password</label>
               </div>
               <div class="input-wrapper" :class="{ 'has-error': errors.password }">
-                <span class="input-icon">🔒</span>
+                <span class="input-icon">*</span>
                 <input
                   :type="showPassword ? 'text' : 'password'"
                   id="password"
@@ -85,7 +85,7 @@
                   class="password-toggle"
                   @click="showPassword = !showPassword"
                 >
-                  {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+                  {{ showPassword ? 'Hide' : 'Show' }}
                 </button>
               </div>
               <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
@@ -114,14 +114,14 @@
                 class="btn btn-demo"
                 @click="fillAdminCredentials"
               >
-                <span>👔</span> Admin Login
+                Admin Login
               </button>
               <button 
                 type="button" 
                 class="btn btn-demo"
                 @click="fillUserCredentials"
               >
-                <span>👤</span> User Login
+                User Login
               </button>
             </div>
           </div>
@@ -167,8 +167,8 @@ export default {
     },
     
     fillUserCredentials() {
-      this.email = 'user@example.com';
-      this.password = 'password123';
+      this.email = 'user@parkapp.com';
+      this.password = 'user123';
       this.clearAllErrors();
     },
     

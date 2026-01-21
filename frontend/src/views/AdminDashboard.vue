@@ -4,11 +4,11 @@
       <!-- Page Header -->
       <div class="page-header">
         <div class="header-content">
-          <h1>Admin Dashboard 📊</h1>
+          <h1>Admin Dashboard</h1>
           <p>Manage parking lots, users, and monitor system activity</p>
         </div>
         <button @click="showAddLotModal = true" class="btn btn-primary">
-          <span>➕</span> Add Parking Lot
+          Add Parking Lot
         </button>
       </div>
 
@@ -20,7 +20,7 @@
 
       <!-- Error State -->
       <div v-else-if="error" class="error-container">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon">!</div>
         <h3>Failed to load dashboard</h3>
         <p>{{ error }}</p>
         <button @click="loadDashboard" class="btn btn-primary">Try Again</button>
@@ -31,7 +31,7 @@
         <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card stat-card-primary">
-            <div class="stat-icon">🏢</div>
+            <div class="stat-icon">L</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.total_lots }}</span>
               <span class="stat-label">Total Lots</span>
@@ -39,7 +39,7 @@
           </div>
           
           <div class="stat-card stat-card-info">
-            <div class="stat-icon">🅿️</div>
+            <div class="stat-icon">P</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.total_spots }}</span>
               <span class="stat-label">Total Spots</span>
@@ -47,7 +47,7 @@
           </div>
           
           <div class="stat-card stat-card-warning">
-            <div class="stat-icon">🚗</div>
+            <div class="stat-icon">O</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.total_occupied }}</span>
               <span class="stat-label">Occupied</span>
@@ -55,7 +55,7 @@
           </div>
           
           <div class="stat-card stat-card-success">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon">A</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.total_available }}</span>
               <span class="stat-label">Available</span>
@@ -63,7 +63,7 @@
           </div>
           
           <div class="stat-card stat-card-secondary">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon">U</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.total_users }}</span>
               <span class="stat-label">Users</span>
@@ -71,7 +71,7 @@
           </div>
           
           <div class="stat-card stat-card-accent">
-            <div class="stat-icon">📋</div>
+            <div class="stat-icon">R</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.total_reservations }}</span>
               <span class="stat-label">Reservations</span>
@@ -79,7 +79,7 @@
           </div>
           
           <div class="stat-card stat-card-revenue">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon">$</div>
             <div class="stat-content">
               <span class="stat-value">${{ stats.total_revenue.toFixed(2) }}</span>
               <span class="stat-label">Revenue</span>
@@ -87,7 +87,7 @@
           </div>
           
           <div class="stat-card stat-card-rate">
-            <div class="stat-icon">📈</div>
+            <div class="stat-icon">%</div>
             <div class="stat-content">
               <span class="stat-value">{{ stats.occupancy_rate }}%</span>
               <span class="stat-label">Occupancy</span>
@@ -130,7 +130,7 @@
                   <tr v-for="lot in lots" :key="lot.id">
                     <td>
                       <div class="lot-name-cell">
-                        <span class="lot-icon">🏢</span>
+                        <span class="lot-icon">L</span>
                         <span>{{ lot.name }}</span>
                       </div>
                     </td>
@@ -367,9 +367,9 @@ export default {
         max_spots: null
       },
       tabs: [
-        { id: 'lots', label: 'Parking Lots', icon: '🏢' },
-        { id: 'users', label: 'Users', icon: '👥' },
-        { id: 'reservations', label: 'Reservations', icon: '📋' }
+        { id: 'lots', label: 'Parking Lots', icon: 'L' },
+        { id: 'users', label: 'Users', icon: 'U' },
+        { id: 'reservations', label: 'Reservations', icon: 'R' }
       ]
     };
   },

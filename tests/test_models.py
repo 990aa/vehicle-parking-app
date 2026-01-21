@@ -6,9 +6,10 @@ import uuid
 
 
 def test_user_creation(db):
+    unique_id = str(uuid.uuid4())[:8]
     user = User(
-        username="testuser",
-        email="test@example.com",
+        username=f"testuser_{unique_id}",
+        email=f"test_{unique_id}@example.com",
         password=hash_password("password"),
         active=True,
         fs_uniquifier=str(uuid.uuid4()),
@@ -16,9 +17,9 @@ def test_user_creation(db):
     db.session.add(user)
     db.session.commit()
 
-    retrieved_user = User.query.filter_by(email="test@example.com").first()
+    retrieved_user = User.query.filter_by(email=f"test_{unique_id}@example.com").first()
     assert retrieved_user is not None
-    assert retrieved_user.username == "testuser"
+    assert retrieved_user.username == f"testuser_{unique_id}"
 
 
 def test_user_role_assignment(db):

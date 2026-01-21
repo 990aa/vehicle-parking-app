@@ -4,7 +4,7 @@
       <!-- Page Header -->
       <div class="page-header">
         <div class="header-content">
-          <h1>Find Parking 🅿️</h1>
+          <h1>Find Parking</h1>
           <p>Browse available parking lots and reserve your spot</p>
         </div>
       </div>
@@ -17,7 +17,7 @@
 
       <!-- Error State -->
       <div v-else-if="error" class="error-container">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon">!</div>
         <h3>Failed to load parking lots</h3>
         <p>{{ error }}</p>
         <button @click="loadLots" class="btn btn-primary">Try Again</button>
@@ -27,7 +27,7 @@
       <template v-else>
         <!-- Empty State -->
         <div v-if="lots.length === 0" class="empty-state">
-          <div class="empty-icon">🏢</div>
+          <div class="empty-icon">P</div>
           <h3>No parking lots available</h3>
           <p>Check back later for available parking options</p>
         </div>
@@ -52,7 +52,7 @@
             <div class="lot-body">
               <h3 class="lot-name">{{ lot.name }}</h3>
               <p class="lot-address">
-                <span class="address-icon">📍</span>
+                <span class="address-icon">@</span>
                 {{ lot.address }}
               </p>
               
@@ -111,7 +111,7 @@
 
             <!-- Error Message -->
             <div v-if="reservationError" class="alert alert-error">
-              <span>⚠️</span>
+              <span>!</span>
               <span>{{ reservationError }}</span>
             </div>
 
@@ -232,7 +232,7 @@
 
             <!-- Step 3: Confirmation -->
             <div v-if="reservationStep === 3" class="reservation-step confirmation">
-              <div class="success-icon">✅</div>
+              <div class="success-icon">OK</div>
               <h4>Reservation Confirmed!</h4>
               <p>Your parking spot has been reserved successfully.</p>
               

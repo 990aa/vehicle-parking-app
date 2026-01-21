@@ -4,8 +4,8 @@
     <nav v-if="showNavbar" class="navbar">
       <div class="navbar-container">
         <router-link to="/" class="navbar-brand">
-          <span class="brand-icon">🚗</span>
-          <span class="brand-text">parkapp</span>
+          <span class="brand-icon">P</span>
+          <span class="brand-text">ParkApp</span>
         </router-link>
         
         <button class="navbar-toggle" @click="mobileMenuOpen = !mobileMenuOpen" v-if="isLoggedIn">
@@ -26,18 +26,18 @@
               to="/admin/dashboard" 
               class="nav-link"
             >
-              <span class="nav-icon">📊</span> Dashboard
+              Dashboard
             </router-link>
             <router-link 
               v-else 
               to="/user/dashboard" 
               class="nav-link"
             >
-              <span class="nav-icon">🏠</span> Dashboard
+              Dashboard
             </router-link>
             
             <router-link to="/parking" class="nav-link" v-if="userRole !== 'admin'">
-              <span class="nav-icon">🅿️</span> Find Parking
+              Find Parking
             </router-link>
             
             <div class="nav-user">
@@ -59,9 +59,9 @@
     <!-- Toast Notifications -->
     <div class="toast-container" v-if="toast.show">
       <div :class="['toast', `toast-${toast.type}`]">
-        <span class="toast-icon">{{ toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ' }}</span>
+        <span class="toast-icon">{{ toast.type === 'success' ? 'OK' : toast.type === 'error' ? 'X' : 'i' }}</span>
         <span class="toast-message">{{ toast.message }}</span>
-        <button class="toast-close" @click="toast.show = false">×</button>
+        <button class="toast-close" @click="toast.show = false">x</button>
       </div>
     </div>
   </div>
