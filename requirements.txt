@@ -392,9 +392,9 @@ flask-caching==2.3.0 \
     --hash=sha256:51771c75682e5abc1483b78b96d9131d7941dc669b073852edfa319dd4e29b6e \
     --hash=sha256:d7e4ca64a33b49feb339fcdd17e6ba25f5e01168cf885e53790e885f83a4d2cf
     # via vehicle-parking-app
-flask-cors==4.0.0 \
-    --hash=sha256:bc3492bfd6368d27cfe79c7821df5a8a319e1a6d5eab277a3794be19bdc51783 \
-    --hash=sha256:f268522fcb2f73e2ecdde1ef45e2fd5c71cc48fe03cffb4b441c6d1b40684eb0
+flask-cors==4.0.2 \
+    --hash=sha256:38364faf1a7a5d0a55bd1d2e2f83ee9e359039182f5e6a029557e1f56d92c09a \
+    --hash=sha256:493b98e2d1e2f1a4720a7af25693ef2fe32fbafec09a2f72c59f3e475eda61d2
     # via vehicle-parking-app
 flask-jwt-extended==4.7.1 \
     --hash=sha256:52f35bf0985354d7fb7b876e2eb0e0b141aaff865a22ff6cc33d9a18aa987978 \
