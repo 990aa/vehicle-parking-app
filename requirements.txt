@@ -924,7 +924,7 @@ prometheus-client==0.23.1 \
     --hash=sha256:6ae8f9081eaaaf153a2e959d2e6c4f4fb57b12ef76c8c7980202f1e57b48b2ce \
     --hash=sha256:dd1913e6e76b59cfe44e7a4b83e01afc9873c1bdfd2ed8739f1e76aeca115f99
     # via flower
-prompt-toolkit==3.0.52 \
+prompt-toolkit==3.0.53 \
     --hash=sha256:28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855 \
     --hash=sha256:9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955
     # via click-repl
@@ -1395,3 +1395,6 @@ yarl==1.22.0 \
     --hash=sha256:f87ac53513d22240c7d59203f25cc3beac1e574c6cd681bbfd321987b69f95fd \
     --hash=sha256:ff86011bd159a9d2dfc89c34cfd8aff12875980e3bd6a39ff097887520e60249
     # via aiohttp
+prompt_toolkit==3.0.53 \
+    --hash=sha256:01c0891d7f9237d5e339f7d3e42cdae80b7534abb1c7c0e3352efba6231492f2 \
+    --hash=sha256:9ec8a0ad96d5c56148b3f914aa79c1564c3fde5d2e6b876e7bc327e353cf8fa6
