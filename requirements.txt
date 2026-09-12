@@ -1348,9 +1348,9 @@ Werkzeug==3.1.8 \
     #   flask-login
     #   flask-restx
     #   vehicle-parking-app
-wtforms==3.2.1 \
-    --hash=sha256:583bad77ba1dd7286463f21e11aa3043ca4869d03575921d1a1698d0715e0fd4 \
-    --hash=sha256:df3e6b70f3192e92623128123ec8dca3067df9cfadd43d59681e210cfb8d4682
+WTForms==3.2.2 \
+    --hash=sha256:72b90d5d921bd3119252069cf0301e9c13915f9e52792652bc91c5dda4b79e56 \
+    --hash=sha256:7b00c73f8670f35d4edb0293dcd81b980528bee72fd662b182aaba27ae570b93
     # via
     #   flask-security-too
     #   flask-wtf
