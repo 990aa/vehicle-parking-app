@@ -150,9 +150,9 @@ cachelib==0.9.0 \
     --hash=sha256:38222cc7c1b79a23606de5c2607f4925779e37cdcea1c2ad21b8bae94b5425a5 \
     --hash=sha256:811ceeb1209d2fe51cd2b62810bd1eccf70feba5c52641532498be5c675493b3
     # via flask-caching
-celery==5.4.0 \
-    --hash=sha256:369631eb580cf8c51a82721ec538684994f8277637edde2dfc0dacd73ed97f64 \
-    --hash=sha256:504a19140e8d3029d5acad88330c541d4c3f64c789d85f94756762d8bca7e706
+celery==5.6.3 \
+    --hash=sha256:0808f42f80909c4d5833202360ffafb2a4f83f4d8e23e1285d926610e9a7afa6 \
+    --hash=sha256:177006bd2054b882e9f01be59abd8529e88879ef50d7918a7050c5a9f4e12912
     # via
     #   flower
     #   vehicle-parking-app
