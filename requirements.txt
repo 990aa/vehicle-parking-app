@@ -492,9 +492,9 @@ Flask==3.1.3 \
     #   flask-sqlalchemy
     #   flask-wtf
     #   vehicle-parking-app
-flask-caching==2.3.0 \
-    --hash=sha256:51771c75682e5abc1483b78b96d9131d7941dc669b073852edfa319dd4e29b6e \
-    --hash=sha256:d7e4ca64a33b49feb339fcdd17e6ba25f5e01168cf885e53790e885f83a4d2cf
+Flask-Caching==2.5.1 \
+    --hash=sha256:a8591b0315f033d1f10ba67e318b82b3179e548306195ec08e8f0c5f8ef287bf \
+    --hash=sha256:f75b451fde3faac0e278da72263818134deca8c4ba6bb07b9b3b238991368dae
     # via vehicle-parking-app
 flask-cors==4.0.2 \
     --hash=sha256:38364faf1a7a5d0a55bd1d2e2f83ee9e359039182f5e6a029557e1f56d92c09a \
