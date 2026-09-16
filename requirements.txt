@@ -1112,9 +1112,9 @@ multidict==6.7.1 \
     # via
     #   aiohttp
     #   yarl
-narwhals==2.15.0 \
-    --hash=sha256:a9585975b99d95084268445a1fdd881311fa26ef1caa18020d959d5b2ff9a965 \
-    --hash=sha256:cbfe21ca19d260d9fd67f995ec75c44592d1f106933b03ddd375df7ac841f9d6
+narwhals==2.26.0 \
+    --hash=sha256:29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54 \
+    --hash=sha256:6b9cadca82f375c7e4cf584fdc86ca25da54827307a9c58f94547ee6104b82dd
     # via plotly
 packaging==25.0 \
     --hash=sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484 \
