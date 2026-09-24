@@ -18,7 +18,7 @@ importers:
         specifier: ^1.13.1
         version: 1.13.1
       core-js:
-        specifier: ^3.50.0
+        specifier: ^3.8.3
         version: 3.50.0
       vue:
         specifier: '3'
@@ -31,8 +31,8 @@ importers:
         specifier: ^7.12.16
         version: 7.29.7(supports-color@8.1.1)
       '@babel/eslint-parser':
-        specifier: ^7.12.16
-        version: 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(eslint@7.32.0(supports-color@8.1.1))
+        specifier: ^7.29.9
+        version: 7.29.9(@babel/core@7.29.7(supports-color@8.1.1))(eslint@7.32.0(supports-color@8.1.1))
       '@vue/cli-plugin-babel':
         specifier: ~5.0.0
         version: 5.0.9(@vue/cli-service@5.0.9(@vue/compiler-sfc@3.5.21)(clean-css@5.3.3)(csso@4.2.0)(ejs@3.1.10)(lodash@4.17.21)(prettier@2.8.8)(supports-color@8.1.1)(vue@3.5.42)(webpack-sources@3.3.3))(core-js@3.50.0)(supports-color@8.1.1)(vue@3.5.42)
@@ -87,8 +87,8 @@ packages:
     resolution: {integrity: sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/eslint-parser@7.29.7':
-    resolution: {integrity: sha512-zxt+UJTOMKvUt3yOg+D58MLuz334pHp93qifMFcjIIO+9hN6t+ufw2gi7vDPMpxvfnHRR+3VVXvIjineCcgyXw==}
+  '@babel/eslint-parser@7.29.9':
+    resolution: {integrity: sha512-GmrJTAtiRbNip+eKFqeuSvoHMJhKlH36j8U0yE3Gqn45B+SIO7NvsEiHtsmzkBqV1hLSMqYr41dI1aZLTkJ37g==}
     engines: {node: ^10.13.0 || ^12.13.0 || >=14.0.0}
     peerDependencies:
       '@babel/core': ^7.11.0
@@ -4477,7 +4477,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/eslint-parser@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(eslint@7.32.0(supports-color@8.1.1))':
+  '@babel/eslint-parser@7.29.9(@babel/core@7.29.7(supports-color@8.1.1))(eslint@7.32.0(supports-color@8.1.1))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@8.1.1)
       '@nicolo-ribaudo/eslint-scope-5-internals': 5.1.1-v1
