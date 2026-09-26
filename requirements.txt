@@ -1242,9 +1242,9 @@ pillow==12.3.0 \
     --hash=sha256:fe3cca2e4e8a592be0f269a1ca4835c25199d9f3ce815c8491048f785b0a0198 \
     --hash=sha256:ffd0c5368496f41b0944be820fcb7a838aa6e623d250b01acf2643939c3f99d7
     # via reportlab
-pipreqs==0.4.13 \
-    --hash=sha256:a17f167880b6921be37533ce4c81ddc6e22b465c107aad557db43b1add56a99b \
-    --hash=sha256:e522b9ed54aa3e8b7978ff251ab7a9af2f75d2cd8de4c102e881b666a79a308e
+pipreqs==0.5.0 \
+    --hash=sha256:0809f6217028e35785f80e90217e18043e58c99ba28175e28320f9074dd03874 \
+    --hash=sha256:f33298d235ff76def369cb9a3594d084d9badc70cebba1e8cb271fcd4fdc0183
     # via vehicle-parking-app
 plotly==6.9.0 \
     --hash=sha256:36bebe2f1bb13884774fe61689c329071446f6ce4a8927fb1f0d6fb24f581236 \
