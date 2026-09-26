@@ -16,7 +16,7 @@ dependencies = [
     "Jinja2==3.1.6",
     "pipreqs==0.5.0",
     "plotly==6.9.0",
-    "PyJWT==2.10.1",
+    "PyJWT==2.15.0",
     "python-dotenv==1.1.1",
     "requests==2.32.5",
     "SQLAlchemy==2.0.54",
