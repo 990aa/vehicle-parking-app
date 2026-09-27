@@ -2195,7 +2195,7 @@ wheels = [
 
 [[package]]
 name = "twilio"
-version = "8.11.1"
+version = "8.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -2203,9 +2203,9 @@ dependencies = [
     { name = "pyjwt" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2a/ad/2b8dca2fe50095392084cb2352c2bda92c585f2285ee5922d0f42b854f46/twilio-8.11.1.tar.gz", hash = "sha256:6dfafb60e7a89ad19d2fc4055ce2b86215d30fc68d88452fa588897de8608c71", size = 886914, upload-time = "2024-01-14T15:09:36.322Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/81/2e/b4185b9ee9faffb65813e1cdefb23bf55a584f57adeff967ab6b0243b0f8/twilio-8.13.0.tar.gz", hash = "sha256:89f629fa280b51bc21cd58b35cf640f9bbf88efd3977c0c5ec6ea6821b9880cd", size = 891474, upload-time = "2024-02-09T12:31:51.157Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/37/a57d8f0edea6b60068cc1a82313697230a46f885bb99c2bd7bdff8d98452/twilio-8.11.1-py2.py3-none-any.whl", hash = "sha256:0c079601b972cca25dbe0e259d5c4a01c94795842f6b9f1d02c82269019d7cbb", size = 1681769, upload-time = "2024-01-14T15:09:32.834Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/22/88e3dfbbc1ccabaa58b0e20d4c29ae03d0877040eb4a03143bbec318f23e/twilio-8.13.0-py2.py3-none-any.whl", hash = "sha256:f5396e355de11b80c6729bd286fdc0e12c9c0b025c465f16f090034a7ef88d3d", size = 1689264, upload-time = "2024-02-09T12:31:48.118Z" },
 ]
 
 [[package]]
@@ -2336,7 +2336,7 @@ requires-dist = [
     { name = "reportlab", specifier = "==4.4.3" },
     { name = "requests", specifier = "==2.32.5" },
     { name = "sqlalchemy", specifier = "==2.0.54" },
-    { name = "twilio", specifier = "==8.11.1" },
+    { name = "twilio", specifier = "==8.13.0" },
     { name = "uvicorn", specifier = ">=0.40.0" },
     { name = "werkzeug", specifier = "==3.1.8" },
     { name = "wtforms", specifier = "==3.2.2" },
