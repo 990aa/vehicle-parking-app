@@ -1598,9 +1598,9 @@ tornado==6.5.10 \
     --hash=sha256:bdf942448169e5336451d0494d7e3d81cfa726d5aa312affdc4682dd62a62f6d \
     --hash=sha256:ce045d3c298fddd30e89a2777f97039d1b641eb9518ac7b26a4721903539c694
     # via flower
-twilio==8.11.1 \
-    --hash=sha256:0c079601b972cca25dbe0e259d5c4a01c94795842f6b9f1d02c82269019d7cbb \
-    --hash=sha256:6dfafb60e7a89ad19d2fc4055ce2b86215d30fc68d88452fa588897de8608c71
+twilio==8.13.0 \
+    --hash=sha256:89f629fa280b51bc21cd58b35cf640f9bbf88efd3977c0c5ec6ea6821b9880cd \
+    --hash=sha256:f5396e355de11b80c6729bd286fdc0e12c9c0b025c465f16f090034a7ef88d3d
     # via vehicle-parking-app
 typing-extensions==4.15.0 \
     --hash=sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466 \
